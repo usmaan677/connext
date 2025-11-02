@@ -1,51 +1,158 @@
-# Welcome to your Expo app 👋
+# UH Clubs App 🎓
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A cross-platform mobile application for University of Houston clubs built with Expo and React Native. This app allows students to discover and explore university clubs with a modern, intuitive interface.
 
-## Get started
+## 🚀 Quick Start
 
-1. Install dependencies
+### Prerequisites
 
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (version 18 or higher) - [Download here](https://nodejs.org/)
+- **npm** or **yarn** package manager
+- **Expo CLI** (optional but recommended)
+- **Git** - [Download here](https://git-scm.com/)
+
+For mobile development:
+- **iOS**: Xcode (macOS only) or Expo Go app
+- **Android**: Android Studio or Expo Go app
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd uh-clubs
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+3. **Start the development server**
    ```bash
+   npm start
+   # or
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+4. **Run on your preferred platform**
+   - **iOS Simulator**: Press `i` in the terminal or run `npm run ios`
+   - **Android Emulator**: Press `a` in the terminal or run `npm run android`
+   - **Web Browser**: Press `w` in the terminal or run `npm run web`
+   - **Physical Device**: Scan the QR code with Expo Go app
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 📱 Platform Support
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+This app supports:
+- ✅ iOS (iPhone & iPad)
+- ✅ Android
+- ✅ Web browsers
+- ✅ Both light and dark themes
 
-## Get a fresh project
+## 🛠 Development Scripts
 
-When you're ready, run:
+- `npm start` - Start the Expo development server
+- `npm run android` - Run on Android emulator/device
+- `npm run ios` - Run on iOS simulator/device
+- `npm run web` - Run in web browser
+- `npm run lint` - Run ESLint for code quality
+- `npm run reset-project` - Reset to blank project template
 
-```bash
-npm run reset-project
+## 📁 Project Structure
+
+```
+uh-clubs/
+├── app/                    # App screens and navigation
+│   ├── (tabs)/            # Tab-based navigation
+│   │   ├── index.tsx      # Home/main screen
+│   │   └── explore.tsx    # Explore clubs screen
+│   ├── _layout.tsx        # Root layout
+│   └── modal.tsx          # Modal screens
+├── assets/                # Static assets (images, icons)
+├── components/            # Reusable React components
+│   └── ui/               # UI component library
+├── constants/             # App constants and themes
+├── hooks/                 # Custom React hooks
+└── connext/              # Additional app modules
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🎨 Features
 
-## Learn more
+- **Tab Navigation**: Easy navigation between main app sections
+- **Dark/Light Theme**: Automatic theme switching based on system preferences
+- **Cross-Platform**: Runs on iOS, Android, and web
+- **Modern UI**: Built with Expo's latest components and design patterns
+- **TypeScript**: Full type safety and better development experience
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🔧 Technology Stack
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Framework**: Expo SDK ~54.0
+- **Language**: TypeScript
+- **UI Library**: React Native with Expo components
+- **Navigation**: Expo Router (file-based routing)
+- **Styling**: React Native StyleSheet
+- **Icons**: Expo Vector Icons
+- **Development**: ESLint for code quality
 
-## Join the community
+## 📦 Key Dependencies
 
-Join our community of developers creating universal apps.
+- **Expo Router**: File-based navigation system
+- **React Navigation**: Tab and stack navigation
+- **Expo Vector Icons**: Icon library
+- **React Native Reanimated**: Smooth animations
+- **Expo Haptics**: Tactile feedback
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# connext
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Metro bundler issues**
+   ```bash
+   npx expo start --clear
+   ```
+
+2. **Node modules issues**
+   ```bash
+   rm -rf node_modules
+   npm install
+   ```
+
+3. **iOS build issues**
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+4. **Android build issues**
+   - Ensure Android Studio and SDK are properly installed
+   - Check that ANDROID_HOME environment variable is set
+
+### Getting Help
+
+- **Expo Documentation**: [https://docs.expo.dev/](https://docs.expo.dev/)
+- **React Native Docs**: [https://reactnative.dev/](https://reactnative.dev/)
+- **Expo Discord**: [https://chat.expo.dev](https://chat.expo.dev)
+
+## 🎯 Getting Started with Development
+
+1. **For new features**: Create a new screen in the `app/` directory
+2. **For reusable components**: Add them to the `components/` directory
+3. **For styling**: Use the theme constants in `constants/theme.ts`
+4. **For navigation**: Expo Router uses file-based routing - just create files in `app/`
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+**Happy coding! 🚀**
