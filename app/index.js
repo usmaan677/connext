@@ -1,8 +1,7 @@
-import "../global.css";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router"; // ✅ needed for navigation
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
+import "../global.css";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,6 +14,7 @@ export default function HomeScreen() {
       style={styles.background}
     >
       <View style={styles.overlay}>
+        {/* Title & Subtitle */}
         <Text style={styles.title}>Welcome to Connext 🎓</Text>
         <Text style={styles.subtitle}>
           See what’s happening around campus today!
@@ -23,7 +23,7 @@ export default function HomeScreen() {
         {/* Log In Button */}
         <TouchableOpacity
           style={[styles.button, styles.loginButton]}
-          onPress={() => router.push("/login")} // ✅ navigate to login page
+          onPress={() => router.push("/login")}
         >
           <Text style={[styles.buttonText, styles.loginText]}>Log In</Text>
         </TouchableOpacity>
@@ -34,9 +34,12 @@ export default function HomeScreen() {
           onPress={() => router.push("/signup")}
         >
           <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
-          <Text className = "font-white">Continue as Guest</Text>
         </TouchableOpacity>
 
+        {/* Continue as Guest */}
+        <TouchableOpacity onPress={() => router.push("/(tabs)/home")}>
+          <Text style={styles.guestText}>Continue as Guest</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
@@ -92,5 +95,11 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: "#000",
+  },
+  guestText: {
+    color: "#fff",
+    marginTop: 12,
+    fontSize: 14,
+    textDecorationLine: "underline",
   },
 });
