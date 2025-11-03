@@ -1,6 +1,8 @@
+import "../global.css";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router"; // ✅ needed for navigation
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
 
 export default function HomeScreen() {
   const router = useRouter();
