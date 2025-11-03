@@ -51,12 +51,6 @@
             "backgroundColor": "#000000"
           }
         }
-      ],
-      [
-        "expo-location",
-        {
-          "locationAlwaysAndWhenInUsePermission": "UH Clubs uses your location to show nearby events and help you navigate to event locations."
-        }
       ]
     ],
     "experiments": {

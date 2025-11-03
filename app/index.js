@@ -34,6 +34,7 @@ export default function HomeScreen() {
           onPress={() => router.push("/signup")}
         >
           <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
+          <Text className = "font-white">Continue as Guest</Text>
         </TouchableOpacity>
 
       </View>
