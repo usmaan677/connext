@@ -1,20 +1,33 @@
-import Slider from "@react-native-community/slider"; // ✅ only here
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-
-// ⚠️ NOTE: If you see an error about "Slider" being undefined,
-// run this command and import from that package instead:
-// npm install @react-native-community/slider
-// import Slider from "@react-native-community/slider";
+import { Dropdown } from "react-native-element-dropdown";
 
 export default function SignupScreen() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [gradYear, setGradYear] = useState(2025);
+  const [clubname, setClubName] = useState("");
+  const [clubemail, setClubEmail] = useState("");
+  const [clubpassword, setClubPassword] = useState("");
+  const [linktree, setLinktree] = useState("");
+  const [category, setCategory] = useState(null);
+
+  const categories = [
+    { label: "Academic", value: "academic" },
+    { label: "Cultural", value: "cultural" },
+    { label: "Sports", value: "sports" },
+    { label: "Arts", value: "arts" },
+    { label: "Technology", value: "technology" },
+    { label: "Social", value: "social" },
+  ];
+
+  const onSubmit = () => {
+    if (!clubname || !clubemail || !clubpassword || !category) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    alert("Club signed up successfully!");
+  };
 
   return (
     <LinearGradient
@@ -30,19 +43,19 @@ export default function SignupScreen() {
         {/* Name Input */}
         <TextInput
           style={styles.input}
-          placeholder="Full Name"
+          placeholder="Club Name"
           placeholderTextColor="#ccc"
-          value={name}
-          onChangeText={setName}
+          value={clubname}
+          onChangeText={setClubName}
         />
 
         {/* Email Input */}
         <TextInput
           style={styles.input}
-          placeholder="University Email(.edu)"
+          placeholder="Club Email"
           placeholderTextColor="#ccc"
-          value={email}
-          onChangeText={setEmail}
+          value={clubemail}
+          onChangeText={setClubEmail}
         />
 
         {/* Password Input */}
@@ -51,28 +64,35 @@ export default function SignupScreen() {
           placeholder="Password"
           placeholderTextColor="#ccc"
           secureTextEntry
-          value={password}
-          onChangeText={setPassword}
+          value={clubpassword}
+          onChangeText={setClubPassword}
         />
 
-        {/* Graduation Year Slider */}
-        <View style={styles.sliderContainer}>
-          <Text style={styles.sliderLabel}>Graduation Year: {gradYear}</Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={2025}
-            maximumValue={2030}
-            step={1}
-            minimumTrackTintColor="#00C2CB"
-            maximumTrackTintColor="#999"
-            thumbTintColor="#fff"
-            value={gradYear}
-            onValueChange={setGradYear}
-          />
-        </View>
+        {/* Linktree Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Linktree URL"
+          placeholderTextColor="#ccc"
+          value={linktree}
+          onChangeText={setLinktree}
+        />
+
+        {/* Category Dropdown */}
+        <Text style={styles.label}>Category</Text>
+        <Dropdown
+          style={styles.dropdown}
+          placeholderStyle={{ color: "#ccc" }}
+          selectedTextStyle={{ color: "#fff" }}
+          data={categories}
+          labelField="label"
+          valueField="value"
+          placeholder="Choose category..."
+          value={category}
+          onChange={(item) => setCategory(item.value)}
+        />
 
         {/* Sign Up Button */}
-        <TouchableOpacity style={[styles.button, styles.signupButton]}>
+        <TouchableOpacity style={[styles.button, styles.signupButton]} onPress={onSubmit}>
           <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
         </TouchableOpacity>
 
@@ -126,20 +146,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.3)",
   },
-  sliderContainer: {
+  dropdown: {
     width: "80%",
-    alignItems: "stretch",
-    marginBottom: 25,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.3)",
   },
-  sliderLabel: {
+  label: {
     color: "#fff",
-    textAlign: "center",
-    marginBottom: 10,
-    fontSize: 16,
-  },
-  slider: {
-    width: "100%",
-    height: 40,
+    alignSelf: "flex-start",
+    marginLeft: "10%",
+    marginBottom: 5,
   },
   button: {
     width: 220,

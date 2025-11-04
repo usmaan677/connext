@@ -31,7 +31,7 @@ export default function HomeScreen() {
         {/* Sign Up Button */}
         <TouchableOpacity
           style={[styles.button, styles.signupButton]}
-          onPress={() => router.push("/signup")}
+          onPress={() => router.push("/Choice")}
         >
           <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
         </TouchableOpacity>
