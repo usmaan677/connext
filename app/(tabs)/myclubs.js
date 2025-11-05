@@ -1,5 +1,4 @@
 import { LinearGradient } from 'expo-linear-gradient';
-<<<<<<< HEAD
 import { Calendar, Clock, MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -20,10 +19,8 @@ const mockEvents = [
   { id: '4', title: 'Art Expo', date: 'Dec 2, 2025', time: '5:00 PM', location: 'Fine Arts Center' },
   { id: '5', title: 'Debate Night', date: 'Dec 10, 2025', time: '6:30 PM', location: 'Lecture Hall 3' },
 ];
-=======
+
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
->>>>>>> f0eec02d532b7e47e9e59d0e6fbeeec8ad97161b
 
 export default function MyClubs() {
   const [activeTab, setActiveTab] = useState('Clubs');
