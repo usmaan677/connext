@@ -1,28 +1,6 @@
-import { Feather } from '@expo/vector-icons';
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-const posts = [
-  {
-    id: 1,
-    username: "@PENGUAM",
-    image: "https://placekitten.com/400/300",
-    caption: "Why is the formatting for these cards so snitz",
-  },
-  {
-    id: 2,
-    username: "@RTC",
-    image: "https://placekitten.com/401/300",
-    caption: "Usmaan fix plz",
-  },
-  {
-    id: 3,
-    username: "@penguamy",
-    image: "https://placekitten.com/402/300",
-    caption: "UMR President caught having affair with Ammar Ansari! #GoCoogs",
-  },
-];
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   const router = useRouter();
