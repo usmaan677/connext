@@ -2,7 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function SignupChoice() {
+export default function ChoiceScreen() {
   const router = useRouter();
 
   return (
@@ -14,7 +14,9 @@ export default function SignupChoice() {
     >
       <View style={styles.overlay}>
         <Text style={styles.title}>Join Connext 🚀</Text>
-        <Text style={styles.subtitle}>Choose how you’d like to sign up</Text>
+        <Text style={styles.subtitle}>
+          Choose how you’d like to get started
+        </Text>
 
         {/* Student Button */}
         <TouchableOpacity
@@ -32,7 +34,7 @@ export default function SignupChoice() {
           <Text style={[styles.buttonText, styles.clubText]}>Club</Text>
         </TouchableOpacity>
 
-        {/* Back Button (optional) */}
+        {/* Back Button */}
         <TouchableOpacity
           style={[styles.button, styles.backButton]}
           onPress={() => router.back()}
@@ -45,8 +47,17 @@ export default function SignupChoice() {
 }
 
 const styles = StyleSheet.create({
-  background: { flex: 1, justifyContent: "center", alignItems: "center" },
-  overlay: { alignItems: "center", paddingHorizontal: 20, width: "100%" },
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    width: "100%",
+  },
   title: {
     fontSize: 32,
     fontWeight: "bold",
@@ -56,7 +67,12 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 6,
   },
-  subtitle: { fontSize: 16, color: "#eee", marginBottom: 40, textAlign: "center" },
+  subtitle: {
+    fontSize: 16,
+    color: "#eee",
+    marginBottom: 40,
+    textAlign: "center",
+  },
   button: {
     width: 220,
     paddingVertical: 14,
@@ -68,11 +84,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 5,
   },
-  studentButton: { backgroundColor: "#00C2CB" },
-  clubButton: { backgroundColor: "#6A00FF" },
-  backButton: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#000" },
-  buttonText: { fontSize: 18, fontWeight: "700" },
-  studentText: { color: "#fff" },
-  clubText: { color: "#fff" },
-  backText: { color: "#000" },
+  studentButton: {
+    backgroundColor: "#00C2CB",
+  },
+  clubButton: {
+    backgroundColor: "#6A00FF",
+  },
+  backButton: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  studentText: {
+    color: "#fff",
+  },
+  clubText: {
+    color: "#fff",
+  },
+  backText: {
+    color: "#000",
+  },
 });
