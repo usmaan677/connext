@@ -10,6 +10,12 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "gray",
         tabBarStyle: {
           backgroundColor: "#1B0034",
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        sceneContainerStyle: {
+          backgroundColor: 'transparent',
         },
       }}
     >
