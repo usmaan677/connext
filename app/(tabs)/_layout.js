@@ -12,13 +12,11 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: "#1B0034",
           borderTopWidth: 0,
-          height: 80,
-          paddingBottom: 10,
-          paddingTop: 10,
+          elevation: 0,
+          shadowOpacity: 0,
         },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
+        sceneContainerStyle: {
+          backgroundColor: 'transparent',
         },
       }}
     >

@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Mock user data
 const mockUser = {
@@ -53,7 +52,6 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState('Posts');
   const [refreshing, setRefreshing] = useState(false);
   const [followAnimation] = useState(new Animated.Value(1));
-  const insets = useSafeAreaInsets();
 
   // Handle follow/unfollow with optimistic updates
   const handleFollowToggle = async () => {
@@ -155,7 +153,7 @@ export default function Profile() {
     >
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top }]}
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -167,7 +165,7 @@ export default function Profile() {
         showsVerticalScrollIndicator={false}
       >
         {/* Header Section */}
-        <View className="px-6 pt-4 pb-6">
+        <View style={styles.headerSection}>
           {/* Avatar and Basic Info */}
           <View className="items-center mb-6">
             <Image
@@ -249,7 +247,7 @@ export default function Profile() {
         </View>
 
         {/* Tabs Section */}
-        <View className="px-6 pb-8">
+        <View style={styles.tabsSection}>
           {/* Tab Headers */}
           <View className="flex-row bg-white/10 backdrop-blur-sm rounded-2xl p-2 mb-4 border border-white/20">
             {['Posts', 'Clubs', 'Events'].map((tab) => (
@@ -289,5 +287,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+  },
+  headerSection: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 24,
+  },
+  tabsSection: {
+    paddingHorizontal: 24,
+    paddingBottom: 100,
   },
 });
