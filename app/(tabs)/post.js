@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function Post() {
   return (
@@ -12,7 +12,7 @@ export default function Post() {
     >
       <View style={styles.content}>
         <Text style={styles.title}>Create Post</Text>
-        <Text style={styles.subtitle}>Share what's happening on campus</Text>
+        <Text style={styles.subtitle}>Share whats happening on campus</Text>
       </View>
     </LinearGradient>
   );
