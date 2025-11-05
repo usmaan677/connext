@@ -1,11 +1,9 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import "../global.css";
 
 export default function HomeScreen() {
-  const router = useRouter();
-
   return (
     <LinearGradient
       colors={["#1B0034", "#370078", "#00C2CB"]}
@@ -37,7 +35,12 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         {/* Continue as Guest */}
-        <TouchableOpacity onPress={() => router.push("/(tabs)/home")}>
+        <TouchableOpacity
+          onPress={() => {
+            // 👇 This replaces the current screen with your home tab layout (with navbar)
+            router.replace("/(tabs)/home");
+          }}
+        >
           <Text style={styles.guestText}>Continue as Guest</Text>
         </TouchableOpacity>
       </View>

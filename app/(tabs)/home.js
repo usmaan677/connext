@@ -1,14 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-export default function Home() {
+export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>🏠 Welcome to the Home Tab!</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#1B0034" }}>
+      <Text style={{ color: "white", fontSize: 20, fontWeight: "bold" }}>
+        Welcome to Home Page
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  text: { fontSize: 18, fontWeight: "600" },
-});
