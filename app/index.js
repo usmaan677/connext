@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import "../global.css";
+import { Text, TouchableOpacity, View } from "react-native";
+import "../global.css"; // keep if you're using Expo Web or have global styles
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -11,95 +11,46 @@ export default function HomeScreen() {
       colors={["#1B0034", "#370078", "#00C2CB"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={styles.background}
+      className="flex-1 items-center justify-center"
     >
-      <View style={styles.overlay}>
-        {/* Title & Subtitle */}
-        <Text style={styles.title}>Welcome to Connext 🎓</Text>
-        <Text style={styles.subtitle}>
+      <View className="items-center justify-center px-5">
+        <Text className="text-white text-3xl font-bold mb-2">
+          Welcome to Connext 🎓
+        </Text>
+
+        <Text className="text-gray-200 text-base text-center mb-8">
           See what’s happening around campus today!
         </Text>
 
-        {/* Log In Button */}
+        {/* Log In */}
         <TouchableOpacity
-          style={[styles.button, styles.loginButton]}
+          className="w-56 py-3 rounded-full items-center mb-3 bg-black"
           onPress={() => router.push("/login")}
+          activeOpacity={0.85}
         >
-          <Text style={[styles.buttonText, styles.loginText]}>Log In</Text>
+          <Text className="text-white text-base font-semibold">Log In</Text>
         </TouchableOpacity>
 
-        {/* Sign Up Button */}
+        {/* Sign Up */}
         <TouchableOpacity
-          style={[styles.button, styles.signupButton]}
+          className="w-56 py-3 rounded-full items-center mb-3 bg-white border border-black"
           onPress={() => router.push("/signup")}
+          activeOpacity={0.85}
         >
-          <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
+          <Text className="text-black text-base font-semibold">Sign Up</Text>
         </TouchableOpacity>
 
         {/* Continue as Guest */}
-        <TouchableOpacity onPress={() => router.push("/(tabs)/home")}>
-          <Text style={styles.guestText}>Continue as Guest</Text>
+        <TouchableOpacity
+          className="w-56 py-3 rounded-full items-center border border-white"
+          onPress={() => router.push("/guest")}
+          activeOpacity={0.85}
+        >
+          <Text className="text-white text-base font-semibold">
+            Continue as Guest
+          </Text>
         </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  overlay: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-    textShadowColor: "rgba(0,0,0,0.4)",
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#eee",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  button: {
-    width: 220,
-    paddingVertical: 12,
-    borderRadius: 25,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  loginButton: {
-    backgroundColor: "#000",
-  },
-  signupButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loginText: {
-    color: "#fff",
-  },
-  signupText: {
-    color: "#000",
-  },
-  guestText: {
-    color: "#fff",
-    marginTop: 12,
-    fontSize: 14,
-    textDecorationLine: "underline",
-  },
-});
