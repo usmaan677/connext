@@ -1,6 +1,29 @@
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+// Mock posts data
+const posts = [
+  {
+    id: 1,
+    username: "uh_cs_club",
+    image: "https://picsum.photos/340/200?random=1",
+    caption: "Join us for our weekly coding workshop! 🚀"
+  },
+  {
+    id: 2,
+    username: "uh_gaming",
+    image: "https://picsum.photos/340/200?random=2",
+    caption: "Tournament this Friday - prizes for winners! 🎮"
+  },
+  {
+    id: 3,
+    username: "uh_entrepreneurs",
+    image: "https://picsum.photos/340/200?random=3",
+    caption: "Pitch competition applications now open 💡"
+  }
+];
 
 export default function HomeScreen() {
   const router = useRouter();
