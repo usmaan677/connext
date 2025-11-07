@@ -33,7 +33,7 @@ export default function SignupChoice() {
             <View style={styles.cardIcon}>
               <Users size={32} color="#ffffff" />
             </View>
-            <Text style={styles.cardTitle}>I'm a Student</Text>
+            <Text style={styles.cardTitle}>Im a Student</Text>
             <Text style={styles.cardDescription}>
               Discover clubs, events, and connect with peers
             </Text>
@@ -48,7 +48,7 @@ export default function SignupChoice() {
             <View style={styles.cardIcon}>
               <Building size={32} color="#ffffff" />
             </View>
-            <Text style={styles.cardTitle}>I'm a Club</Text>
+            <Text style={styles.cardTitle}>Im a Club</Text>
             <Text style={styles.cardDescription}>
               Promote your club and manage events
             </Text>
@@ -58,7 +58,7 @@ export default function SignupChoice() {
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => router.push("/Choice")}
           activeOpacity={0.8}
         >
           <Text style={styles.backText}>← Back to Welcome</Text>
