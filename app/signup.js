@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { Building, Users } from "lucide-react-native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Users, Building } from "lucide-react-native";
 
 export default function SignupChoice() {
   const router = useRouter();

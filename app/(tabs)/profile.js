@@ -1,9 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Calendar, Clock, MapPin, Users } from 'lucide-react-native';
+import { MapPin, GraduationCap, BookOpen, Star, Calendar, Trophy } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   Alert,
-  Animated,
   Image,
   RefreshControl,
   ScrollView,
@@ -19,129 +18,31 @@ const mockUser = {
   name: "Usmaan Sayed",
   handle: "usmaan",
   avatar: "https://placekitten.com/200/200",
-  bio: "CS @ UH • Building the UH Clubs App",
-  location: "Houston, TX",
+  email: "usmaan@cougarnet.uh.edu",
+  college: "University of Houston",
   major: "Computer Science",
   gradYear: 2027,
-  stats: { followers: 108, following: 42, clubs: 7, events: 12 },
-  isSelf: false,
-  isFollowing: false
+  location: "Houston, TX",
+  studentId: "1234567"
 };
 
-// Mock data for tabs
-const mockPosts = [
-  { id: '1', content: 'Just joined the UH Computer Science Club! Excited to meet fellow developers 🚀', timestamp: '2h ago' },
-  { id: '2', content: 'Great networking event at the Engineering building today. Met some amazing alumni!', timestamp: '1d ago' },
-  { id: '3', content: 'Working on a new React Native project. The Expo ecosystem is fantastic!', timestamp: '3d ago' },
-];
-
+// Mock clubs data
 const mockClubs = [
-  { id: '1', name: 'UH Computer Science Club', tagline: 'Building the future, one line of code at a time' },
-  { id: '2', name: 'UH Entrepreneurship Society', tagline: 'Turning ideas into reality' },
-  { id: '3', name: 'UH Gaming Club', tagline: 'Level up your gaming experience' },
-];
-
-const mockEvents = [
-  { id: '1', title: 'React Native Workshop', date: 'Nov 15, 2025', time: '6:00 PM', location: 'Engineering Building' },
-  { id: '2', title: 'Startup Pitch Competition', date: 'Nov 20, 2025', time: '7:00 PM', location: 'Business Building' },
-  { id: '3', title: 'Gaming Tournament', date: 'Nov 25, 2025', time: '2:00 PM', location: 'Student Center' },
+  { id: '1', name: 'UH Computer Science Club', role: 'Member' },
+  { id: '2', name: 'UH Entrepreneurship Society', role: 'Vice President' },
+  { id: '3', name: 'UH Gaming Club', role: 'Member' },
 ];
 
 export default function Profile() {
   const [user, setUser] = useState(mockUser);
-  const [activeTab, setActiveTab] = useState('Posts');
   const [refreshing, setRefreshing] = useState(false);
-  const [followAnimation] = useState(new Animated.Value(1));
-
-  // Handle follow/unfollow with optimistic updates
-  const handleFollowToggle = async () => {
-    const wasFollowing = user.isFollowing;
-    const originalFollowerCount = user.stats.followers;
-
-    // Optimistic update
-    setUser(prev => ({
-      ...prev,
-      isFollowing: !prev.isFollowing,
-      stats: {
-        ...prev.stats,
-        followers: prev.isFollowing ? prev.stats.followers - 1 : prev.stats.followers + 1
-      }
-    }));
-
-    // Animate button
-    Animated.sequence([
-      Animated.timing(followAnimation, { toValue: 0.95, duration: 100, useNativeDriver: true }),
-      Animated.timing(followAnimation, { toValue: 1, duration: 100, useNativeDriver: true })
-    ]).start();
-
-    // Simulate network request
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate random failure (10% chance)
-      if (Math.random() < 0.1) {
-        throw new Error('Network error');
-      }
-    } catch (error) {
-      // Revert optimistic update on failure
-      setUser(prev => ({
-        ...prev,
-        isFollowing: wasFollowing,
-        stats: {
-          ...prev.stats,
-          followers: originalFollowerCount
-        }
-      }));
-      Alert.alert('Error', 'Failed to update follow status. Please try again.');
-    }
-  };
 
   // Handle pull to refresh
   const onRefresh = async () => {
     setRefreshing(true);
     // Simulate network request
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     setRefreshing(false);
-  };
-
-  // Render tab content
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'Posts':
-        return mockPosts.map((item) => (
-          <View key={item.id} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-3 border border-white/20">
-            <Text className="text-white text-base leading-relaxed mb-2">{item.content}</Text>
-            <Text className="text-gray-300 text-sm">{item.timestamp}</Text>
-          </View>
-        ));
-      case 'Clubs':
-        return mockClubs.map((item) => (
-          <View key={item.id} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-3 border border-white/20">
-            <Text className="text-white text-lg font-semibold mb-1">{item.name}</Text>
-            <Text className="text-gray-300 text-sm">{item.tagline}</Text>
-          </View>
-        ));
-      case 'Events':
-        return mockEvents.map((item) => (
-          <View key={item.id} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-3 border border-white/20">
-            <Text className="text-white text-lg font-semibold mb-2">{item.title}</Text>
-            <View className="flex-row items-center mb-1">
-              <Calendar size={16} color="#d1d5db" />
-              <Text className="text-gray-300 text-sm ml-2">{item.date}</Text>
-            </View>
-            <View className="flex-row items-center mb-1">
-              <Clock size={16} color="#d1d5db" />
-              <Text className="text-gray-300 text-sm ml-2">{item.time}</Text>
-            </View>
-            <View className="flex-row items-center">
-              <MapPin size={16} color="#d1d5db" />
-              <Text className="text-gray-300 text-sm ml-2">{item.location}</Text>
-            </View>
-          </View>
-        ));
-      default:
-        return null;
-    }
   };
 
   return (
@@ -164,115 +65,150 @@ export default function Profile() {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Section */}
+        {/* Profile Header with Avatar */}
         <View style={styles.headerSection}>
-          {/* Avatar and Basic Info */}
-          <View className="items-center mb-6">
-            <Image
-              source={{ uri: user.avatar }}
-              className="w-32 h-32 rounded-full border-4 border-white/20 mb-4"
-            />
-            <Text className="text-white text-2xl font-bold text-center">{user.name}</Text>
-            <Text className="text-gray-300 text-lg">@{user.handle}</Text>
-          </View>
-
-          {/* Bio */}
-          <Text className="text-gray-200 text-base text-center mb-4 leading-relaxed px-4">
-            {user.bio}
-          </Text>
-
-          {/* Affiliation Chips */}
-          <View className="flex-row justify-center items-center mb-4 flex-wrap">
-            <View className="bg-white/20 rounded-full px-4 py-2 mr-2 mb-2">
-              <Text className="text-white text-sm font-medium">{user.major} @ UH</Text>
-            </View>
-            <View className="bg-white/20 rounded-full px-4 py-2 mb-2">
-              <Text className="text-white text-sm font-medium">Class of {user.gradYear}</Text>
-            </View>
-          </View>
-
-          {/* Location */}
-          <View className="flex-row justify-center items-center mb-6">
-            <MapPin size={16} color="#d1d5db" />
-            <Text className="text-gray-300 text-sm ml-2">{user.location}</Text>
-          </View>
-
-          {/* Stats Row */}
-          <View className="flex-row justify-around bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-6 border border-white/20">
-            <View className="items-center">
-              <Text className="text-white text-xl font-bold">{user.stats.following}</Text>
-              <Text className="text-gray-300 text-sm">Following</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-white text-xl font-bold">{user.stats.followers}</Text>
-              <Text className="text-gray-300 text-sm">Followers</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-white text-xl font-bold">{user.stats.clubs}</Text>
-              <Text className="text-gray-300 text-sm">Clubs</Text>
-            </View>
-            <View className="items-center">
-              <Text className="text-white text-xl font-bold">{user.stats.events}</Text>
-              <Text className="text-gray-300 text-sm">Events</Text>
-            </View>
-          </View>
-
-          {/* Follow/Edit Button */}
-          <Animated.View style={{ transform: [{ scale: followAnimation }] }}>
-            <TouchableOpacity
-              className={`w-full py-4 rounded-full items-center ${
-                user.isSelf
-                  ? 'bg-white'
-                  : user.isFollowing
-                  ? 'bg-white/20 border-2 border-white'
-                  : 'bg-white'
-              }`}
-              onPress={user.isSelf ? () => Alert.alert('Edit Profile', 'Edit profile functionality would go here') : handleFollowToggle}
-              activeOpacity={0.8}
+          <View style={styles.avatarContainer}>
+            <LinearGradient
+              colors={["#00C2CB", "#370078"]}
+              style={styles.avatarGradientBorder}
             >
-              <View className="flex-row items-center">
-                {!user.isSelf && <Users size={18} color={user.isFollowing ? "#ffffff" : "#111827"} />}
-                <Text className={`text-lg font-semibold ${
-                  user.isSelf
-                    ? 'text-gray-900'
-                    : user.isFollowing
-                    ? 'text-white ml-2'
-                    : 'text-gray-900 ml-2'
-                }`}>
-                  {user.isSelf ? 'Edit Profile' : user.isFollowing ? 'Following' : 'Follow'}
-                </Text>
+              <View style={styles.avatarInnerContainer}>
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={styles.avatar}
+                />
               </View>
-            </TouchableOpacity>
-          </Animated.View>
+            </LinearGradient>
+            <View style={styles.profileBadge}>
+              <Star size={16} color="#FFD700" fill="#FFD700" />
+            </View>
+          </View>
+
+          <Text style={styles.userName}>{user.name}</Text>
+          <Text style={styles.userHandle}>@{user.handle}</Text>
+          <Text style={styles.userEmail}>{user.email}</Text>
         </View>
 
-        {/* Tabs Section */}
-        <View style={styles.tabsSection}>
-          {/* Tab Headers */}
-          <View className="flex-row bg-white/10 backdrop-blur-sm rounded-2xl p-2 mb-4 border border-white/20">
-            {['Posts', 'Clubs', 'Events'].map((tab) => (
-              <TouchableOpacity
-                key={tab}
-                className={`flex-1 py-3 rounded-xl items-center ${
-                  activeTab === tab ? 'bg-white/20' : ''
-                }`}
-                onPress={() => setActiveTab(tab)}
-                activeOpacity={0.7}
-              >
-                <Text className={`font-semibold ${
-                  activeTab === tab ? 'text-white' : 'text-gray-300'
-                }`}>
-                  {tab}
-                </Text>
+        {/* Stats Row */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <View style={[styles.statIcon, { backgroundColor: '#00C2CB' }]}>
+              <Trophy size={20} color="#fff" />
+            </View>
+            <Text style={styles.statNumber}>3</Text>
+            <Text style={styles.statLabel}>Clubs</Text>
+          </View>
+          <View style={styles.statItem}>
+            <View style={[styles.statIcon, { backgroundColor: '#6A00FF' }]}>
+              <Calendar size={20} color="#fff" />
+            </View>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Events</Text>
+          </View>
+          <View style={styles.statItem}>
+            <View style={[styles.statIcon, { backgroundColor: '#FF6B6B' }]}>
+              <Star size={20} color="#fff" />
+            </View>
+            <Text style={styles.statNumber}>4.8</Text>
+            <Text style={styles.statLabel}>Rating</Text>
+          </View>
+        </View>
+
+        {/* Academic Info Card */}
+        <View style={styles.card}>
+          <LinearGradient
+            colors={["rgba(0, 194, 203, 0.1)", "rgba(55, 0, 120, 0.1)"]}
+            style={styles.cardGradient}
+          >
+            <Text style={styles.cardTitle}>🎓 Academic Information</Text>
+            
+            <View style={styles.infoGrid}>
+              <View style={styles.infoItem}>
+                <View style={styles.infoIconContainer}>
+                  <GraduationCap size={24} color="#00C2CB" />
+                </View>
+                <View style={styles.infoTextContainer}>
+                  <Text style={styles.infoLabel}>University</Text>
+                  <Text style={styles.infoValue}>{user.college}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoItem}>
+                <View style={styles.infoIconContainer}>
+                  <BookOpen size={24} color="#6A00FF" />
+                </View>
+                <View style={styles.infoTextContainer}>
+                  <Text style={styles.infoLabel}>Major</Text>
+                  <Text style={styles.infoValue}>{user.major}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoItem}>
+                <View style={styles.infoIconContainer}>
+                  <Calendar size={24} color="#FF6B6B" />
+                </View>
+                <View style={styles.infoTextContainer}>
+                  <Text style={styles.infoLabel}>Graduation</Text>
+                  <Text style={styles.infoValue}>Class of {user.gradYear}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoItem}>
+                <View style={styles.infoIconContainer}>
+                  <MapPin size={24} color="#FFD700" />
+                </View>
+                <View style={styles.infoTextContainer}>
+                  <Text style={styles.infoLabel}>Location</Text>
+                  <Text style={styles.infoValue}>{user.location}</Text>
+                </View>
+              </View>
+            </View>
+          </LinearGradient>
+        </View>
+
+        {/* My Clubs Section */}
+        <View style={styles.card}>
+          <LinearGradient
+            colors={["rgba(106, 0, 255, 0.1)", "rgba(0, 194, 203, 0.1)"]}
+            style={styles.cardGradient}
+          >
+            <Text style={styles.cardTitle}>🏛️ My Clubs</Text>
+            {mockClubs.map((club, index) => (
+              <TouchableOpacity key={club.id} style={styles.clubCard} activeOpacity={0.8}>
+                <View style={styles.clubIconContainer}>
+                  <LinearGradient
+                    colors={index % 2 === 0 ? ["#00C2CB", "#370078"] : ["#6A00FF", "#FF6B6B"]}
+                    style={styles.clubIconGradient}
+                  >
+                    <Text style={styles.clubIconText}>{club.name.charAt(0)}</Text>
+                  </LinearGradient>
+                </View>
+                <View style={styles.clubInfo}>
+                  <Text style={styles.clubName}>{club.name}</Text>
+                  <View style={styles.roleContainer}>
+                    <Text style={styles.clubRole}>{club.role}</Text>
+                  </View>
+                </View>
               </TouchableOpacity>
             ))}
-          </View>
-
-          {/* Tab Content */}
-          <View>
-            {renderTabContent()}
-          </View>
+          </LinearGradient>
         </View>
+
+        {/* Edit Profile Button */}
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => Alert.alert('Edit Profile', 'Edit profile functionality would go here')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={["#00C2CB", "#6A00FF"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.editButtonGradient}
+          >
+            <Text style={styles.editButtonText}>✨ Edit Profile</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </ScrollView>
     </LinearGradient>
   );
@@ -287,14 +223,219 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 100,
   },
   headerSection: {
-    paddingHorizontal: 24,
+    alignItems: 'center',
     paddingTop: 60,
-    paddingBottom: 24,
-  },
-  tabsSection: {
+    paddingBottom: 32,
     paddingHorizontal: 24,
-    paddingBottom: 100,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  avatarGradientBorder: {
+    padding: 4,
+    borderRadius: 70,
+    shadowColor: '#00C2CB',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  avatarInnerContainer: {
+    borderRadius: 66,
+    overflow: 'hidden',
+  },
+  avatar: {
+    width: 132,
+    height: 132,
+  },
+  profileBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+    borderRadius: 16,
+    padding: 8,
+    borderWidth: 2,
+    borderColor: '#FFD700',
+  },
+  userName: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 4,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  userHandle: {
+    fontSize: 18,
+    color: '#00C2CB',
+    marginBottom: 4,
+    fontWeight: '600',
+  },
+  userEmail: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.7)',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 24,
+    marginBottom: 24,
+  },
+  statItem: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    padding: 20,
+    flex: 1,
+    marginHorizontal: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  statIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '500',
+  },
+  card: {
+    marginHorizontal: 24,
+    marginBottom: 24,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  cardGradient: {
+    padding: 24,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  infoGrid: {
+    gap: 16,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  infoIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  infoTextContainer: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    marginBottom: 2,
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  clubCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  clubIconContainer: {
+    marginRight: 16,
+  },
+  clubIconGradient: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  clubIconText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  clubInfo: {
+    flex: 1,
+  },
+  clubName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  roleContainer: {
+    alignSelf: 'flex-start',
+  },
+  clubRole: {
+    fontSize: 14,
+    color: '#00C2CB',
+    fontWeight: '500',
+    backgroundColor: 'rgba(0, 194, 203, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 194, 203, 0.3)',
+  },
+  editButton: {
+    marginHorizontal: 24,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#00C2CB',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  editButtonGradient: {
+    paddingVertical: 18,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+  },
+  editButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
