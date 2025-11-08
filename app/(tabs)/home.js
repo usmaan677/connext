@@ -38,18 +38,22 @@ export default function HomeScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.feedContent} showsVerticalScrollIndicator={false}>
-        {/* Header with sign up button (not sticky) */}
-        <View style={styles.headerRow}>
-          <Text style={[styles.title, { flex: 1, textAlign: 'left' }]}>Connext 🚀</Text>
-          <TouchableOpacity
-            style={styles.signUpButtonCorner}
-            onPress={() => router.push("/signup")}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.buttonTextSmall}>Sign Up</Text>
-          </TouchableOpacity>
+      {/* Polished App Header */}
+      <View style={styles.headerWrapper}>
+        <View style={styles.logoGroup}>
+          <Text style={styles.logoText}>Connext</Text>
+          <View style={styles.logoAccent} />
         </View>
+        <TouchableOpacity
+          style={styles.signInBtnNew}
+          onPress={() => router.push('/login')}
+          activeOpacity={0.85}
+        >
+            <Text style={styles.signInBtnLabel}>Sign In</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.feedContent} showsVerticalScrollIndicator={false}>
         {/* Instagram-style feed */}
         {posts.map(post => (
           <View key={post.id} style={styles.postCard}>
@@ -202,5 +206,108 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 60,
+    paddingBottom: 16,
+  },
+  headerTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  signInButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#00C2CB',
+  },
+  signInText: {
+    color: '#00C2CB',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  appHeader: {
+    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  logoText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  signInBtn: {
+    backgroundColor: 'transparent',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#00C2CB',
+  },
+  signInBtnText: {
+    color: '#00C2CB',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  headerDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    marginTop: 8,
+  },
+  headerWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingTop: 42,
+    paddingHorizontal: 18,
+    paddingBottom: 10,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
+  logoGroup: {
+    position: 'relative',
+    paddingBottom: 4,
+  },
+  logoAccent: {
+    position: 'absolute',
+    left: 2,
+    right: 14,
+    bottom: 0,
+    height: 4,
+    borderRadius: 4,
+    backgroundColor: '#00C2CB',
+    opacity: 0.85,
+  },
+  signInBtnNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  signInBtnLabel: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.4,
   },
 });
