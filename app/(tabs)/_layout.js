@@ -1,22 +1,29 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { View } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#00C2CB",
-        tabBarInactiveTintColor: "#8B5A9B",
+        tabBarActiveTintColor: colors.tabActive,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
-          backgroundColor: "#1B0034",
-          borderTopWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
+          backgroundColor: colors.tabBackground,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+          elevation: 8,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
         },
         sceneContainerStyle: {
-          backgroundColor: 'transparent',
+          backgroundColor: colors.background,
         },
       }}
     >
@@ -47,16 +54,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <View
               style={{
-                backgroundColor: "#00C2CB",
+                backgroundColor: colors.primary,
                 borderRadius: 28,
                 width: 56,
                 height: 56,
                 justifyContent: "center",
                 alignItems: "center",
                 marginBottom: 20,
+                shadowColor: colors.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
               }}
             >
-              <Ionicons name="add" size={28} color="#1B0034" />
+              <Ionicons name="add" size={28} color="#FFFFFF" />
             </View>
           ),
         }}

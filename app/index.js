@@ -5,50 +5,86 @@ import "../global.css";
 
 export default function HomeScreen() {
   return (
-    <LinearGradient
-      colors={["#1B0034", "#370078", "#00C2CB"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.background}
-    >
-      <View style={styles.overlay}>
-        {/* Title & Subtitle */}
-        <Text style={styles.title}>Welcome to Connext 🎓</Text>
-        <Text style={styles.subtitle}>
-          See what’s happening around campus today!
-        </Text>
-
-        {/* Log In Button */}
-        <TouchableOpacity
-          style={[styles.button, styles.loginButton]}
+    <View style={styles.container}>
+      {/* Modern Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Connext</Text>
+        <TouchableOpacity 
+          style={styles.signInButton}
           onPress={() => router.push("/login")}
         >
-          <Text style={[styles.buttonText, styles.loginText]}>Log In</Text>
-        </TouchableOpacity>
-
-        {/* Sign Up Button */}
-        <TouchableOpacity
-          style={[styles.button, styles.signupButton]}
-          onPress={() => router.push("/signup")}
-        >
-          <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
-        </TouchableOpacity>
-
-        {/* Continue as Guest */}
-        <TouchableOpacity
-          onPress={() => {
-            // 👇 This replaces the current screen with your home tab layout (with navbar)
-            router.replace("/(tabs)/home");
-          }}
-        >
-          <Text style={styles.guestText}>Continue as Guest</Text>
+          <Text style={styles.signInText}>Sign in</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+
+      {/* Main Content */}
+      <LinearGradient
+        colors={["#F8FAFC", "#F1F5F9", "#E2E8F0"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.background}
+      >
+        <View style={styles.overlay}>
+          {/* Title & Subtitle */}
+          <Text style={styles.title}>Welcome to Connext 🎓</Text>
+          <Text style={styles.subtitle}>
+            Connect with your campus community
+          </Text>
+
+          {/* Sign Up Button */}
+          <TouchableOpacity
+            style={[styles.button, styles.signupButton]}
+            onPress={() => router.push("/signup")}
+          >
+            <Text style={[styles.buttonText, styles.signupText]}>Get Started</Text>
+          </TouchableOpacity>
+
+          {/* Continue as Guest */}
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/(tabs)/home");
+            }}
+          >
+            <Text style={styles.guestText}>Continue as Guest</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1E293B',
+  },
+  signInButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    backgroundColor: '#3B82F6',
+  },
+  signInText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   background: {
     flex: 1,
     justifyContent: "center",
@@ -57,52 +93,47 @@ const styles = StyleSheet.create({
   overlay: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 32,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-    textShadowColor: "rgba(0,0,0,0.4)",
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 5,
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#1E293B",
+    marginBottom: 16,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
-    color: "#eee",
-    marginBottom: 30,
+    fontSize: 18,
+    color: "#64748B",
+    marginBottom: 40,
     textAlign: "center",
   },
   button: {
-    width: 220,
-    paddingVertical: 12,
-    borderRadius: 25,
+    width: 240,
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: "center",
-    marginBottom: 10,
-  },
-  loginButton: {
-    backgroundColor: "#000",
+    marginBottom: 16,
   },
   signupButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
+    backgroundColor: "#3B82F6",
+    shadowColor: "#3B82F6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  loginText: {
-    color: "#fff",
+    fontSize: 17,
+    fontWeight: "700",
   },
   signupText: {
-    color: "#000",
+    color: "#FFFFFF",
   },
   guestText: {
-    color: "#fff",
-    marginTop: 12,
-    fontSize: 14,
-    textDecorationLine: "underline",
+    color: "#64748B",
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

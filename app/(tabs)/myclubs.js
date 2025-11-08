@@ -1,7 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { Calendar, Clock, MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 // Mock data for clubs and events
 const mockClubs = [
@@ -25,6 +25,7 @@ import React from 'react';
 export default function MyClubs() {
   const [activeTab, setActiveTab] = useState('Clubs');
   const [refreshing, setRefreshing] = useState(false);
+  const { colors } = useTheme();
 
   // Handle pull to refresh
   const onRefresh = async () => {
@@ -48,15 +49,15 @@ export default function MyClubs() {
           <View key={item.id} style={styles.card}>
             <Text style={styles.eventTitle}>{item.title}</Text>
             <View style={styles.eventRow}>
-              <Calendar size={16} color="#d1d5db" />
+              <Calendar size={16} color={colors.primary} />
               <Text style={styles.eventDetail}>{item.date}</Text>
             </View>
             <View style={styles.eventRow}>
-              <Clock size={16} color="#d1d5db" />
+              <Clock size={16} color={colors.success} />
               <Text style={styles.eventDetail}>{item.time}</Text>
             </View>
             <View style={styles.eventRow}>
-              <MapPin size={16} color="#d1d5db" />
+              <MapPin size={16} color={colors.warning} />
               <Text style={styles.eventDetail}>{item.location}</Text>
             </View>
           </View>
@@ -66,13 +67,114 @@ export default function MyClubs() {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    headerSection: {
+      paddingHorizontal: 24,
+      paddingTop: 64, // Added 4px more padding
+      paddingBottom: 24,
+      alignItems: 'center',
+      backgroundColor: colors.header,
+    },
+    tabsSection: {
+      paddingHorizontal: 24,
+      paddingBottom: 100,
+    },
+    title: {
+      color: colors.text,
+      fontSize: 32,
+      fontWeight: 'bold',
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: colors.textSecondary,
+      fontSize: 18,
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    tabHeaderRow: {
+      flexDirection: 'row',
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 4,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    tabButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 12,
+      alignItems: 'center',
+    },
+    tabButtonActive: {
+      backgroundColor: colors.primary,
+    },
+    tabButtonText: {
+      color: colors.textSecondary,
+      fontWeight: '600',
+      fontSize: 16,
+    },
+    tabButtonTextActive: {
+      color: '#FFFFFF',
+    },
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 18,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: colors.shadow,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
+      elevation: 3,
+    },
+    clubName: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 8,
+    },
+    clubTagline: {
+      color: colors.textSecondary,
+      fontSize: 15,
+      lineHeight: 20,
+    },
+    eventTitle: {
+      color: colors.text,
+      fontSize: 17,
+      fontWeight: 'bold',
+      marginBottom: 12,
+    },
+    eventRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8,
+      paddingVertical: 2,
+    },
+    eventDetail: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginLeft: 10,
+      fontWeight: '500',
+    },
+  });
+
   return (
-    <LinearGradient
-      colors={["#1B0034", "#370078", "#00C2CB"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -80,8 +182,8 @@ export default function MyClubs() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#ffffff"
-            colors={["#00C2CB"]}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
         showsVerticalScrollIndicator={false}
@@ -110,101 +212,6 @@ export default function MyClubs() {
           </View>
         </View>
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  headerSection: {
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 24,
-    alignItems: 'center',
-  },
-  tabsSection: {
-    paddingHorizontal: 24,
-    paddingBottom: 100,
-  },
-  title: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#d1d5db',
-    fontSize: 18,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  tabHeaderRow: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    borderRadius: 16,
-    padding: 4,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.20)',
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  tabButtonActive: {
-    backgroundColor: 'rgba(255,255,255,0.20)',
-  },
-  tabButtonText: {
-    color: '#d1d5db',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  tabButtonTextActive: {
-    color: '#fff',
-  },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.20)',
-  },
-  clubName: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  clubTagline: {
-    color: '#d1d5db',
-    fontSize: 15,
-  },
-  eventTitle: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  eventRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  eventDetail: {
-    color: '#d1d5db',
-    fontSize: 14,
-    marginLeft: 8,
-  },
-});

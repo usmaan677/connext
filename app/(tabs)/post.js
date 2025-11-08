@@ -126,23 +126,24 @@ export default function Post() {
   };
 
   return (
-    <View className="flex-1 bg-gray-900">
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+    <View className="flex-1 bg-slate-50">
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       
       {/* Header */}
-      <View className="flex-row items-center justify-between pt-3 px-4 pb-3 border-b border-gray-700 bg-gray-900">
+      <View className="flex-row items-center justify-between pt-16 px-4 pb-3 border-b border-slate-200 bg-white">
         <TouchableOpacity className="w-8">
-          <ArrowLeft size={24} color="#fff" />
+          <ArrowLeft size={24} color="#1E293B" />
         </TouchableOpacity>
         
-        <Text className="text-white text-base font-semibold">New post</Text>
+        <Text className="text-slate-800 text-base font-semibold">New post</Text>
         
         <TouchableOpacity 
-          className={`px-3 py-1.5 rounded ${isPosting ? 'opacity-50' : ''}`}
+          className={`px-3 py-1.5 rounded-lg ${isPosting ? 'opacity-50' : ''}`}
           onPress={handleShare}
           disabled={isPosting}
+          style={isPosting ? {} : { backgroundColor: '#3B82F6' }}
         >
-          <Text className={`text-base font-semibold ${isPosting ? 'text-gray-500' : 'text-blue-400'}`}>
+          <Text className={`text-base font-semibold ${isPosting ? 'text-slate-400' : 'text-white'}`}>
             {isPosting ? 'Sharing...' : 'Share'}
           </Text>
         </TouchableOpacity>
@@ -160,7 +161,7 @@ export default function Post() {
             >
               {selectedImages.map((image, index) => (
                 <View key={index} className="relative" style={{ width, height: width }}>
-                  <Image source={{ uri: image }} className="w-full h-full bg-gray-800" />
+                  <Image source={{ uri: image }} className="w-full h-full bg-slate-100" />
                   <TouchableOpacity 
                     className="absolute top-3 right-3 bg-black/60 rounded-full w-8 h-8 items-center justify-center"
                     onPress={() => removeImage(index)}
@@ -206,11 +207,8 @@ export default function Post() {
                   <TouchableOpacity 
                     key={index}
                     className="mr-2 relative"
-                    onPress={() => {
-                      // You could add functionality to jump to specific image
-                    }}
                   >
-                    <Image source={{ uri: image }} className="w-15 h-15 rounded-lg bg-gray-800" />
+                    <Image source={{ uri: image }} className="w-15 h-15 rounded-lg bg-slate-100" />
                     <TouchableOpacity 
                       className="absolute top-1 right-1 bg-black/60 rounded-full w-6 h-6 items-center justify-center"
                       onPress={() => removeImage(index)}
@@ -223,23 +221,23 @@ export default function Post() {
             )}
           </View>
         ) : (
-          <TouchableOpacity className="justify-center items-center bg-gray-800 border-b border-gray-700" style={{ height: width }} onPress={pickImages}>
+          <TouchableOpacity className="justify-center items-center bg-slate-100 border-b border-slate-200" style={{ height: width }} onPress={pickImages}>
             <View className="items-center">
-              <View className="w-20 h-20 rounded-full bg-gray-700 items-center justify-center mb-4">
-                <Camera size={32} color="#999" />
+              <View className="w-20 h-20 rounded-full bg-slate-200 items-center justify-center mb-4">
+                <Camera size={32} color="#64748B" />
               </View>
-              <Text className="text-gray-400 text-base">Tap to add photos</Text>
-              <Text className="text-gray-500 text-sm mt-1">Add up to 10 photos</Text>
+              <Text className="text-slate-600 text-base">Tap to add photos</Text>
+              <Text className="text-slate-400 text-sm mt-1">Add up to 10 photos</Text>
             </View>
           </TouchableOpacity>
         )}
 
         {/* Change/Add Photo Button */}
         {selectedImages.length > 0 && (
-          <View className="border-b border-gray-700">
+          <View className="border-b border-slate-200 bg-white">
             <TouchableOpacity className="flex-row items-center justify-center py-3" onPress={pickImages}>
               <ImageIcon size={16} color="#3B82F6" />
-              <Text className="text-blue-400 text-sm ml-1.5">
+              <Text className="text-blue-500 text-sm ml-1.5">
                 {selectedImages.length < 10 ? 'Add more photos' : 'Change photos'}
               </Text>
             </TouchableOpacity>
@@ -247,12 +245,12 @@ export default function Post() {
         )}
 
         {/* Caption Input */}
-        <View className="p-4 border-b border-gray-700">
-          <Text className="text-white text-sm font-medium mb-2">Caption</Text>
+        <View className="p-4 border-b border-slate-200 bg-white">
+          <Text className="text-slate-800 text-sm font-medium mb-2">Caption</Text>
           <TextInput
-            className="text-white text-base min-h-10"
+            className="text-slate-800 text-base min-h-10"
             placeholder="Write a caption..."
-            placeholderTextColor="#999"
+            placeholderTextColor="#94A3B8"
             multiline
             value={caption}
             onChangeText={setCaption}
@@ -262,32 +260,32 @@ export default function Post() {
 
         {/* Advanced Options Toggle */}
         <TouchableOpacity 
-          className="flex-row items-center justify-between px-4 py-3 border-b border-gray-700"
+          className="flex-row items-center justify-between px-4 py-3 border-b border-slate-200 bg-white"
           onPress={() => setShowAdvanced(!showAdvanced)}
         >
-          <Text className="text-white text-base">Advanced settings</Text>
+          <Text className="text-slate-800 text-base">Advanced settings</Text>
           <ChevronDown 
             size={16} 
-            color="#999" 
+            color="#64748B" 
             className={showAdvanced ? 'rotate-180' : ''} 
           />
         </TouchableOpacity>
 
         {/* Advanced Options */}
         {showAdvanced && (
-          <View className="bg-gray-800">
+          <View className="bg-slate-50">
             {/* Add Location */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-700">
-              <MapPin size={20} color="#262626" />
+            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
+              <MapPin size={20} color="#64748B" />
               <View className="flex-1 ml-3">
-                <Text className="text-white text-base">Add location</Text>
+                <Text className="text-slate-800 text-base">Add location</Text>
                 {location ? (
-                  <Text className="text-blue-400 text-sm mt-0.5">{location}</Text>
+                  <Text className="text-blue-500 text-sm mt-0.5">{location}</Text>
                 ) : (
                   <TextInput
-                    className="text-gray-400 text-sm mt-0.5"
+                    className="text-slate-500 text-sm mt-0.5"
                     placeholder="Where was this taken?"
-                    placeholderTextColor="#999"
+                    placeholderTextColor="#94A3B8"
                     value={location}
                     onChangeText={setLocation}
                   />
@@ -296,23 +294,23 @@ export default function Post() {
             </TouchableOpacity>
 
             {/* Tag People */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-700">
+            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
               <View className="w-5 h-5 items-center justify-center">
-                <Text className="text-gray-600 text-base font-bold">@</Text>
+                <Text className="text-slate-600 text-base font-bold">@</Text>
               </View>
               <View className="flex-1 ml-3">
-                <Text className="text-white text-base">Tag people</Text>
+                <Text className="text-slate-800 text-base">Tag people</Text>
               </View>
             </TouchableOpacity>
 
             {/* Add Alt Text */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-gray-700">
+            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
               <View className="w-5 h-5 items-center justify-center">
-                <Text className="text-gray-600 text-xs font-bold">Alt</Text>
+                <Text className="text-slate-600 text-xs font-bold">Alt</Text>
               </View>
               <View className="flex-1 ml-3">
-                <Text className="text-white text-base">Write alt text</Text>
-                <Text className="text-gray-400 text-sm mt-0.5">More accessible</Text>
+                <Text className="text-slate-800 text-base">Write alt text</Text>
+                <Text className="text-slate-500 text-sm mt-0.5">More accessible</Text>
               </View>
             </TouchableOpacity>
           </View>
