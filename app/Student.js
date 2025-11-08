@@ -1,8 +1,8 @@
+import { useTheme } from "@/contexts/ThemeContext";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function StudentSignupScreen() {
   const router = useRouter();

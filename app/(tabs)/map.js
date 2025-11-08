@@ -1,4 +1,3 @@
-import { locationList } from "../../constants/LocationList";
 import * as Location from "expo-location";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -15,6 +14,7 @@ import MapView, {
   PROVIDER_GOOGLE,
 } from "react-native-maps";
 import PagerView from "react-native-pager-view";
+import { locationList } from "../../constants/LocationList";
 
 const INITIAL_REGION = {
   latitude: 29.7199,
