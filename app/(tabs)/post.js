@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import * as ImagePicker from 'expo-image-picker';
 import { ArrowLeft, Camera, ChevronDown, Image as ImageIcon, MapPin, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
@@ -13,7 +14,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
