@@ -7,15 +7,18 @@ import {
     Image,
     ScrollView,
     StatusBar,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function Post() {
+  const { colors } = useTheme();
   const [caption, setCaption] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
   const [location, setLocation] = useState('');
@@ -125,72 +128,344 @@ export default function Post() {
     }, 1500);
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingTop: 64,
+      paddingHorizontal: 16,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.header,
+    },
+    headerButton: {
+      width: 32,
+    },
+    headerTitle: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    shareButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 12,
+      backgroundColor: colors.primary,
+    },
+    shareButtonDisabled: {
+      backgroundColor: colors.surface,
+      opacity: 0.6,
+    },
+    shareButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#ffffff',
+    },
+    shareButtonTextDisabled: {
+      color: colors.textSecondary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    imageContainer: {
+      position: 'relative',
+      height: width,
+    },
+    imageScrollView: {
+      height: width,
+    },
+    imageWrapper: {
+      position: 'relative',
+      width: width,
+      height: width,
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      backgroundColor: colors.surface,
+    },
+    removeButton: {
+      position: 'absolute',
+      top: 12,
+      right: 12,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      borderRadius: 20,
+      width: 32,
+      height: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    imageNumber: {
+      position: 'absolute',
+      bottom: 12,
+      left: 12,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    imageNumberText: {
+      color: '#ffffff',
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    imageControls: {
+      position: 'absolute',
+      bottom: 12,
+      right: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    imageCount: {
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      marginRight: 8,
+    },
+    imageCountText: {
+      color: '#ffffff',
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    addButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    addButtonText: {
+      color: '#ffffff',
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    thumbnailStrip: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      paddingVertical: 8,
+      paddingHorizontal: 8,
+    },
+    thumbnailContainer: {
+      marginRight: 8,
+      position: 'relative',
+    },
+    thumbnail: {
+      width: 60,
+      height: 60,
+      borderRadius: 8,
+      backgroundColor: colors.surface,
+    },
+    thumbnailRemove: {
+      position: 'absolute',
+      top: 4,
+      right: 4,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      borderRadius: 12,
+      width: 24,
+      height: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    placeholderContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      height: width,
+    },
+    placeholderIconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.card,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+    },
+    placeholderText: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    placeholderSubtext: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginTop: 4,
+    },
+    photoButtonContainer: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    photoButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+    },
+    photoButtonText: {
+      color: colors.primary,
+      fontSize: 14,
+      marginLeft: 6,
+      fontWeight: '500',
+    },
+    captionContainer: {
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    captionLabel: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 8,
+    },
+    captionInput: {
+      color: colors.text,
+      fontSize: 16,
+      minHeight: 40,
+      lineHeight: 22,
+    },
+    advancedToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    advancedToggleText: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    advancedContainer: {
+      backgroundColor: colors.background,
+    },
+    advancedOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    },
+    advancedIconContainer: {
+      width: 20,
+      height: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    advancedIconText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    advancedTextContainer: {
+      flex: 1,
+      marginLeft: 12,
+    },
+    advancedTitle: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    advancedSubtitle: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginTop: 2,
+    },
+    locationInput: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      marginTop: 2,
+    },
+    locationText: {
+      color: colors.primary,
+      fontSize: 14,
+      marginTop: 2,
+    },
+  });
+
   return (
-    <View className="flex-1 bg-slate-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
       
       {/* Header */}
-      <View className="flex-row items-center justify-between pt-16 px-4 pb-3 border-b border-slate-200 bg-white">
-        <TouchableOpacity className="w-8">
-          <ArrowLeft size={24} color="#1E293B" />
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.headerButton}>
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         
-        <Text className="text-slate-800 text-base font-semibold">New post</Text>
+        <Text style={styles.headerTitle}>New post</Text>
         
         <TouchableOpacity 
-          className={`px-3 py-1.5 rounded-lg ${isPosting ? 'opacity-50' : ''}`}
+          style={[styles.shareButton, isPosting && styles.shareButtonDisabled]}
           onPress={handleShare}
           disabled={isPosting}
-          style={isPosting ? {} : { backgroundColor: '#3B82F6' }}
         >
-          <Text className={`text-base font-semibold ${isPosting ? 'text-slate-400' : 'text-white'}`}>
+          <Text style={[styles.shareButtonText, isPosting && styles.shareButtonTextDisabled]}>
             {isPosting ? 'Sharing...' : 'Share'}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Main Image Area */}
         {selectedImages.length > 0 ? (
-          <View className="relative">
+          <View style={styles.imageContainer}>
             <ScrollView 
               horizontal 
               pagingEnabled 
               showsHorizontalScrollIndicator={false}
-              style={{ height: width }}
+              style={styles.imageScrollView}
             >
               {selectedImages.map((image, index) => (
-                <View key={index} className="relative" style={{ width, height: width }}>
-                  <Image source={{ uri: image }} className="w-full h-full bg-slate-100" />
+                <View key={index} style={styles.imageWrapper}>
+                  <Image source={{ uri: image }} style={styles.image} />
                   <TouchableOpacity 
-                    className="absolute top-3 right-3 bg-black/60 rounded-full w-8 h-8 items-center justify-center"
+                    style={styles.removeButton}
                     onPress={() => removeImage(index)}
                   >
                     <X size={16} color="#fff" />
                   </TouchableOpacity>
                   {/* Image number indicator */}
-                  <View className="absolute bottom-3 left-3 bg-black/60 rounded-xl px-2 py-1">
-                    <Text className="text-white text-xs font-medium">{index + 1}</Text>
+                  <View style={styles.imageNumber}>
+                    <Text style={styles.imageNumberText}>{index + 1}</Text>
                   </View>
                 </View>
               ))}
             </ScrollView>
             
             {/* Multiple images indicator and controls */}
-            <View className="absolute bottom-3 right-3 flex-row items-center">
+            <View style={styles.imageControls}>
               {selectedImages.length > 1 && (
-                <View className="bg-black/60 rounded-xl px-2 py-1 mr-2">
-                  <Text className="text-white text-xs font-medium">{selectedImages.length} photos</Text>
+                <View style={styles.imageCount}>
+                  <Text style={styles.imageCountText}>{selectedImages.length} photos</Text>
                 </View>
               )}
               
               {/* Add more photos button */}
               {selectedImages.length < 10 && (
                 <TouchableOpacity 
-                  className="bg-blue-500 rounded-xl px-2 py-1"
+                  style={styles.addButton}
                   onPress={pickImages}
                 >
-                  <Text className="text-white text-xs font-medium">+ Add</Text>
+                  <Text style={styles.addButtonText}>+ Add</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -200,17 +475,17 @@ export default function Post() {
               <ScrollView 
                 horizontal 
                 showsHorizontalScrollIndicator={false}
-                className="absolute bottom-0 left-0 right-0 bg-black/60 py-2"
+                style={styles.thumbnailStrip}
                 contentContainerStyle={{ paddingHorizontal: 8 }}
               >
                 {selectedImages.map((image, index) => (
                   <TouchableOpacity 
                     key={index}
-                    className="mr-2 relative"
+                    style={styles.thumbnailContainer}
                   >
-                    <Image source={{ uri: image }} className="w-15 h-15 rounded-lg bg-slate-100" />
+                    <Image source={{ uri: image }} style={styles.thumbnail} />
                     <TouchableOpacity 
-                      className="absolute top-1 right-1 bg-black/60 rounded-full w-6 h-6 items-center justify-center"
+                      style={styles.thumbnailRemove}
                       onPress={() => removeImage(index)}
                     >
                       <X size={12} color="#fff" />
@@ -221,23 +496,23 @@ export default function Post() {
             )}
           </View>
         ) : (
-          <TouchableOpacity className="justify-center items-center bg-slate-100 border-b border-slate-200" style={{ height: width }} onPress={pickImages}>
-            <View className="items-center">
-              <View className="w-20 h-20 rounded-full bg-slate-200 items-center justify-center mb-4">
-                <Camera size={32} color="#64748B" />
+          <TouchableOpacity style={styles.placeholderContainer} onPress={pickImages}>
+            <View>
+              <View style={styles.placeholderIconContainer}>
+                <Camera size={32} color={colors.textSecondary} />
               </View>
-              <Text className="text-slate-600 text-base">Tap to add photos</Text>
-              <Text className="text-slate-400 text-sm mt-1">Add up to 10 photos</Text>
+              <Text style={styles.placeholderText}>Tap to add photos</Text>
+              <Text style={styles.placeholderSubtext}>Add up to 10 photos</Text>
             </View>
           </TouchableOpacity>
         )}
 
         {/* Change/Add Photo Button */}
         {selectedImages.length > 0 && (
-          <View className="border-b border-slate-200 bg-white">
-            <TouchableOpacity className="flex-row items-center justify-center py-3" onPress={pickImages}>
-              <ImageIcon size={16} color="#3B82F6" />
-              <Text className="text-blue-500 text-sm ml-1.5">
+          <View style={styles.photoButtonContainer}>
+            <TouchableOpacity style={styles.photoButton} onPress={pickImages}>
+              <ImageIcon size={16} color={colors.primary} />
+              <Text style={styles.photoButtonText}>
                 {selectedImages.length < 10 ? 'Add more photos' : 'Change photos'}
               </Text>
             </TouchableOpacity>
@@ -245,12 +520,12 @@ export default function Post() {
         )}
 
         {/* Caption Input */}
-        <View className="p-4 border-b border-slate-200 bg-white">
-          <Text className="text-slate-800 text-sm font-medium mb-2">Caption</Text>
+        <View style={styles.captionContainer}>
+          <Text style={styles.captionLabel}>Caption</Text>
           <TextInput
-            className="text-slate-800 text-base min-h-10"
+            style={styles.captionInput}
             placeholder="Write a caption..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textTertiary}
             multiline
             value={caption}
             onChangeText={setCaption}
@@ -260,32 +535,32 @@ export default function Post() {
 
         {/* Advanced Options Toggle */}
         <TouchableOpacity 
-          className="flex-row items-center justify-between px-4 py-3 border-b border-slate-200 bg-white"
+          style={styles.advancedToggle}
           onPress={() => setShowAdvanced(!showAdvanced)}
         >
-          <Text className="text-slate-800 text-base">Advanced settings</Text>
+          <Text style={styles.advancedToggleText}>Advanced settings</Text>
           <ChevronDown 
             size={16} 
-            color="#64748B" 
-            className={showAdvanced ? 'rotate-180' : ''} 
+            color={colors.textSecondary} 
+            style={{ transform: [{ rotate: showAdvanced ? '180deg' : '0deg' }] }} 
           />
         </TouchableOpacity>
 
         {/* Advanced Options */}
         {showAdvanced && (
-          <View className="bg-slate-50">
+          <View style={styles.advancedContainer}>
             {/* Add Location */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
-              <MapPin size={20} color="#64748B" />
-              <View className="flex-1 ml-3">
-                <Text className="text-slate-800 text-base">Add location</Text>
+            <TouchableOpacity style={styles.advancedOption}>
+              <MapPin size={20} color={colors.textSecondary} />
+              <View style={styles.advancedTextContainer}>
+                <Text style={styles.advancedTitle}>Add location</Text>
                 {location ? (
-                  <Text className="text-blue-500 text-sm mt-0.5">{location}</Text>
+                  <Text style={styles.locationText}>{location}</Text>
                 ) : (
                   <TextInput
-                    className="text-slate-500 text-sm mt-0.5"
+                    style={styles.locationInput}
                     placeholder="Where was this taken?"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor={colors.textTertiary}
                     value={location}
                     onChangeText={setLocation}
                   />
@@ -294,23 +569,23 @@ export default function Post() {
             </TouchableOpacity>
 
             {/* Tag People */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
-              <View className="w-5 h-5 items-center justify-center">
-                <Text className="text-slate-600 text-base font-bold">@</Text>
+            <TouchableOpacity style={styles.advancedOption}>
+              <View style={styles.advancedIconContainer}>
+                <Text style={styles.advancedIconText}>@</Text>
               </View>
-              <View className="flex-1 ml-3">
-                <Text className="text-slate-800 text-base">Tag people</Text>
+              <View style={styles.advancedTextContainer}>
+                <Text style={styles.advancedTitle}>Tag people</Text>
               </View>
             </TouchableOpacity>
 
             {/* Add Alt Text */}
-            <TouchableOpacity className="flex-row items-center px-4 py-4 border-b border-slate-200 bg-white">
-              <View className="w-5 h-5 items-center justify-center">
-                <Text className="text-slate-600 text-xs font-bold">Alt</Text>
+            <TouchableOpacity style={styles.advancedOption}>
+              <View style={styles.advancedIconContainer}>
+                <Text style={[styles.advancedIconText, { fontSize: 12 }]}>Alt</Text>
               </View>
-              <View className="flex-1 ml-3">
-                <Text className="text-slate-800 text-base">Write alt text</Text>
-                <Text className="text-slate-500 text-sm mt-0.5">More accessible</Text>
+              <View style={styles.advancedTextContainer}>
+                <Text style={styles.advancedTitle}>Write alt text</Text>
+                <Text style={styles.advancedSubtitle}>More accessible</Text>
               </View>
             </TouchableOpacity>
           </View>

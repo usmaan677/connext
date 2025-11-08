@@ -186,9 +186,9 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerSection}>
-          <Text style={styles.title}>Welcome Back! 👋</Text>
+          <Text style={styles.title}>Connext 🚀</Text>
           <Text style={styles.subtitle}>
-            Sign in to continue your Connext journey
+            Welcome back! Sign in to continue your journey
           </Text>
         </View>
 
