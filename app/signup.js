@@ -58,7 +58,7 @@ export default function SignupChoice() {
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.push("/Choice")}
+          onPress={() => router.back()}
           activeOpacity={0.8}
         >
           <Text style={styles.backText}>← Back to Welcome</Text>
