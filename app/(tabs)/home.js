@@ -8,19 +8,22 @@ const posts = [
   {
     id: 1,
     username: "uh_cs_club",
-    image: "https://picsum.photos/340/200?random=1",
+    userAvatar: "https://picsum.photos/40/40?random=10",
+    image: "https://picsum.photos/340/340?random=1",
     caption: "Join us for our weekly coding workshop! 🚀"
   },
   {
     id: 2,
     username: "uh_gaming",
-    image: "https://picsum.photos/340/200?random=2",
+    userAvatar: "https://picsum.photos/40/40?random=20",
+    image: "https://picsum.photos/340/340?random=2",
     caption: "Tournament this Friday - prizes for winners! 🎮"
   },
   {
     id: 3,
     username: "uh_entrepreneurs",
-    image: "https://picsum.photos/340/200?random=3",
+    userAvatar: "https://picsum.photos/40/40?random=30",
+    image: "https://picsum.photos/340/340?random=3",
     caption: "Pitch competition applications now open 💡"
   }
 ];
@@ -35,32 +38,55 @@ export default function HomeScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      {/* Small sign up button in top right corner */}
-      <TouchableOpacity
-        style={styles.signUpButtonCorner}
-        onPress={() => router.push("/signup")}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.buttonTextSmall}>Sign Up</Text>
-      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.feedContent} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Welcome to Home Page</Text>
+        {/* Header with sign up button (not sticky) */}
+        <View style={styles.headerRow}>
+          <Text style={[styles.title, { flex: 1, textAlign: 'left' }]}>Connext 🚀</Text>
+          <TouchableOpacity
+            style={styles.signUpButtonCorner}
+            onPress={() => router.push("/signup")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.buttonTextSmall}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
         {/* Instagram-style feed */}
         {posts.map(post => (
           <View key={post.id} style={styles.postCard}>
-            <Text style={styles.postUsername}>{post.username}</Text>
+            {/* User Header */}
+            <View style={styles.postHeader}>
+              <Image 
+                source={{ uri: post.userAvatar }} 
+                style={styles.userAvatar}
+              />
+              <Text style={styles.postUsername}>@{post.username}</Text>
+            </View>
+
+            {/* Post Image */}
             <Image source={{ uri: post.image }} style={styles.postImage} />
-            <Text style={styles.postCaption}>{post.caption}</Text>
-            <View style={styles.postActions}>
-              <TouchableOpacity style={styles.actionButton}>
-                <Feather name="message-circle" size={20} color="white" />
-                <Text style={[styles.actionText, { color: 'white' }]}>Comment</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton}>
-                <Feather name="send" size={20} color="white" />
-                <Text style={[styles.actionText, { color: 'white' }]}>Send</Text>
+
+            {/* Actions Row - Like, Comment, Share left; Bookmark right */}
+            <View style={styles.postActionsRow}>
+              <View style={styles.leftActions}>
+                <TouchableOpacity style={styles.iconButton}>
+                  <Feather name="heart" size={25} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconButton}>
+                  <Feather name="message-circle" size={25} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.iconButton}>
+                  <Feather name="send" size={24} color="#fff" style={{ transform: [{ rotate: "-10deg" }] }} />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity style={styles.iconButton}>
+                <Feather name="bookmark" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
+
+            {/* Username and Caption below actions */}
+            <Text style={styles.postCaption}>
+              <Text style={styles.captionUsernameBold}>{post.username}</Text> {post.caption}
+            </Text>
           </View>
         ))}
       </ScrollView>
@@ -73,98 +99,108 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   signUpButtonCorner: {
-    position: 'absolute',
-    top: 40,
-    right: 24,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent', // Outline style
     paddingVertical: 6,
     paddingHorizontal: 16,
     borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 2,
+    borderWidth: 2,
+    borderColor: '#00C2CB', // Accent color for outline
+    shadowColor: 'transparent',
+    elevation: 0,
     zIndex: 10,
   },
   buttonTextSmall: {
-    color: '#111827',
+    color: '#00C2CB', // Accent color for text
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
   },
   feedContent: {
-    paddingTop: 100,
     paddingBottom: 40,
-    alignItems: 'center',
-  },
-  title: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    textAlign: 'center',
   },
   postCard: {
     backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 18,
-    width: 340,
-    height: 340, // Make the card more square
-    marginBottom: 28,
-    paddingBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 20,
+    marginHorizontal: 16,
+    borderRadius: 28, // More rounded corners
+    overflow: 'hidden',
+  },
+  postHeader: {
+    flexDirection: 'row',
     alignItems: 'center',
-    overflow: 'hidden', // Ensure image corners are rounded
+    padding: 12,
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 10,
   },
   postUsername: {
-    color: '#00C2CB',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginTop: 14,
-    marginBottom: 8,
-    alignSelf: 'flex-start',
-    marginLeft: 18,
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 14,
   },
   postImage: {
-    width: 340,
-    height: 200,
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    marginBottom: 10,
-    backgroundColor: '#eee',
-    resizeMode: 'cover',
+    width: '100%',
+    height: undefined,
+    aspectRatio: 1,
+    backgroundColor: '#2a2a2a',
+  },
+  postContent: {
+    padding: 12,
+  },
+  postActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    paddingBottom: 8,
+    marginTop: 2,
+  },
+  leftActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 0, // Make buttons even closer together
+  },
+  iconButton: {
+    padding: 8,
+    borderRadius: 50,
+    backgroundColor: 'transparent',
+    marginRight: 1,
+    shadowColor: 'transparent',
+    elevation: 0,
   },
   postCaption: {
     color: 'white',
     fontSize: 15,
-    marginBottom: 8,
-    marginHorizontal: 16,
+    lineHeight: 20,
+    marginHorizontal: 15,
+    marginBottom: 16, // Restore more space below caption
+    marginTop: 0,
     alignSelf: 'flex-start',
-    marginLeft: 18,
-  },
-  postActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    width: '100%',
-    paddingLeft: 12,
-    gap: 16,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 18,
-    paddingVertical: 4,
-    paddingHorizontal: 6,
   },
   actionText: {
-    color: '#555',
+    color: 'white',
+    marginLeft: 8,
     fontSize: 14,
-    marginLeft: 6,
+  },
+  captionUsernameBold: {
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 16,
+    paddingTop: 60, // keeps button below status bar nicely
+    paddingBottom: 16, // space below header
+    gap: 12, // space between title and button
+  },
+  title: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
