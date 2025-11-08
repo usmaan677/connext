@@ -40,32 +40,32 @@ export default function LoginScreen() {
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 24,
-      paddingTop: 80,
-      paddingBottom: 40,
+      paddingTop: 60, // Reduced from 80
+      paddingBottom: 30, // Reduced from 40
       minHeight: '100%',
     },
     headerSection: {
       alignItems: "center",
-      marginBottom: 48,
+      marginBottom: 36, // Reduced from 48
     },
     title: {
-      fontSize: 32,
+      fontSize: 28, // Reduced from 32
       fontWeight: "800",
       color: colors.text,
       marginBottom: 8,
       textAlign: "center",
     },
     subtitle: {
-      fontSize: 18,
+      fontSize: 16, // Reduced from 18
       color: colors.textSecondary,
       textAlign: "center",
-      lineHeight: 24,
+      lineHeight: 22, // Reduced from 24
       paddingHorizontal: 16,
     },
     formContainer: {
       width: "100%",
       maxWidth: 340,
-      gap: 20,
+      gap: 18, // Reduced from 20
     },
     inputContainer: {
       position: "relative",
@@ -75,19 +75,19 @@ export default function LoginScreen() {
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.card,
-      borderRadius: 16,
+      borderRadius: 14, // Reduced from 16
       borderWidth: 1,
       borderColor: colors.border,
-      paddingHorizontal: 20,
-      paddingVertical: 16,
+      paddingHorizontal: 18, // Reduced from 20
+      paddingVertical: 14, // Reduced from 16
     },
     inputIcon: {
-      marginRight: 12,
+      marginRight: 10, // Reduced from 12
     },
     input: {
       flex: 1,
       color: colors.text,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
       fontWeight: "500",
     },
     eyeButton: {
@@ -96,14 +96,14 @@ export default function LoginScreen() {
     },
     buttonContainer: {
       width: "100%",
-      gap: 16,
-      marginTop: 32,
+      gap: 14, // Reduced from 16
+      marginTop: 24, // Reduced from 32
     },
     loginButton: {
       width: "100%",
       backgroundColor: colors.primary,
-      borderRadius: 16,
-      paddingVertical: 18,
+      borderRadius: 14, // Reduced from 16
+      paddingVertical: 16, // Reduced from 18
       alignItems: "center",
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 4 },
@@ -119,34 +119,34 @@ export default function LoginScreen() {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 16,
-      paddingVertical: 18,
+      borderRadius: 14, // Reduced from 16
+      paddingVertical: 16, // Reduced from 18
       alignItems: "center",
     },
     loginText: {
       color: "#FFFFFF",
-      fontSize: 18,
+      fontSize: 16, // Reduced from 18
       fontWeight: "700",
     },
     backText: {
       color: colors.textSecondary,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
       fontWeight: "600",
     },
     forgotPassword: {
       alignSelf: "center",
-      marginTop: 16,
-      paddingVertical: 8,
+      marginTop: 12, // Reduced from 16
+      paddingVertical: 6, // Reduced from 8
     },
     forgotPasswordText: {
       color: colors.primary,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
       fontWeight: "600",
     },
     divider: {
       flexDirection: "row",
       alignItems: "center",
-      marginVertical: 32,
+      marginVertical: 24, // Reduced from 32
       paddingHorizontal: 20,
     },
     dividerLine: {
@@ -164,15 +164,15 @@ export default function LoginScreen() {
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      marginTop: 20,
+      marginTop: 16, // Reduced from 20
     },
     signupText: {
       color: colors.textSecondary,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
     },
     signupLink: {
       color: colors.primary,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
       fontWeight: "600",
       marginLeft: 4,
     },
