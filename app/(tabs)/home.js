@@ -1,8 +1,7 @@
+import { useTheme } from "@/contexts/ThemeContext";
 import { Feather } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useTheme } from "@/contexts/ThemeContext";
 
 // Mock posts data
 const posts = [

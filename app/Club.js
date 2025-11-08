@@ -1,11 +1,12 @@
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
+import { useTheme } from "@/contexts/ThemeContext";
 
-export default function SignupScreen() {
+export default function ClubSignupScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [clubname, setClubName] = useState("");
   const [clubemail, setClubEmail] = useState("");
   const [clubpassword, setClubPassword] = useState("");
@@ -23,167 +24,232 @@ export default function SignupScreen() {
 
   const onSubmit = () => {
     if (!clubname || !clubemail || !clubpassword || !category) {
-      alert("Please fill in all fields.");
+      alert("Please fill in all required fields.");
       return;
     }
     alert("Club signed up successfully!");
+    // Navigate to main app after successful signup
+    router.replace("/(tabs)/home");
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    overlay: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 24,
+      paddingTop: 80,
+      paddingBottom: 40,
+      minHeight: '100%',
+    },
+    headerSection: {
+      alignItems: "center",
+      marginBottom: 40,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "800",
+      color: colors.text,
+      marginBottom: 8,
+      textAlign: "center",
+    },
+    subtitle: {
+      fontSize: 18,
+      color: colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 24,
+      paddingHorizontal: 16,
+    },
+    formContainer: {
+      width: "100%",
+      maxWidth: 340,
+      gap: 16,
+    },
+    inputContainer: {
+      width: "100%",
+    },
+    label: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+      marginBottom: 8,
+    },
+    input: {
+      width: "100%",
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      color: colors.text,
+      borderWidth: 1,
+      borderColor: colors.border,
+      fontSize: 16,
+    },
+    dropdown: {
+      width: "100%",
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    dropdownText: {
+      color: colors.text,
+      fontSize: 16,
+    },
+    placeholderText: {
+      color: colors.textTertiary,
+      fontSize: 16,
+    },
+    buttonContainer: {
+      width: "100%",
+      gap: 16,
+      marginTop: 32,
+    },
+    signupButton: {
+      width: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 18,
+      alignItems: "center",
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 6,
+    },
+    backButton: {
+      width: "100%",
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 16,
+      paddingVertical: 18,
+      alignItems: "center",
+    },
+    signupText: {
+      color: "#FFFFFF",
+      fontSize: 18,
+      fontWeight: "700",
+    },
+    backText: {
+      color: colors.textSecondary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    requiredField: {
+      color: colors.error,
+      fontSize: 14,
+      marginTop: 4,
+    },
+  });
+
   return (
-    <LinearGradient
-      colors={["#1B0034", "#370078", "#00C2CB"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.background}
-    >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Sign Up</Text>
-        <Text style={styles.subtitle}>Join Connext and stay in the loop!</Text>
+    <View style={styles.container}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.overlay}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.headerSection}>
+          <Text style={styles.title}>Club Registration 🏛️</Text>
+          <Text style={styles.subtitle}>
+            Join Connext and connect with students on campus
+          </Text>
+        </View>
 
-        {/* Name Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Club Name"
-          placeholderTextColor="#ccc"
-          value={clubname}
-          onChangeText={setClubName}
-        />
+        <View style={styles.formContainer}>
+          {/* Club Name Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Club Name *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your club name"
+              placeholderTextColor={colors.textTertiary}
+              value={clubname}
+              onChangeText={setClubName}
+            />
+          </View>
 
-        {/* Email Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Club Email"
-          placeholderTextColor="#ccc"
-          value={clubemail}
-          onChangeText={setClubEmail}
-        />
+          {/* Email Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Club Email *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="club@example.com"
+              placeholderTextColor={colors.textTertiary}
+              value={clubemail}
+              onChangeText={setClubEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
 
-        {/* Password Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#ccc"
-          secureTextEntry
-          value={clubpassword}
-          onChangeText={setClubPassword}
-        />
+          {/* Password Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Password *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Create a secure password"
+              placeholderTextColor={colors.textTertiary}
+              secureTextEntry
+              value={clubpassword}
+              onChangeText={setClubPassword}
+            />
+          </View>
 
-        {/* Linktree Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Linktree URL"
-          placeholderTextColor="#ccc"
-          value={linktree}
-          onChangeText={setLinktree}
-        />
+          {/* Linktree Input */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Linktree URL (Optional)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="https://linktr.ee/yourclub"
+              placeholderTextColor={colors.textTertiary}
+              value={linktree}
+              onChangeText={setLinktree}
+              autoCapitalize="none"
+            />
+          </View>
 
-        {/* Category Dropdown */}
-        <Text style={styles.label}>Category</Text>
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={{ color: "#ccc" }}
-          selectedTextStyle={{ color: "#fff" }}
-          data={categories}
-          labelField="label"
-          valueField="value"
-          placeholder="Choose category..."
-          value={category}
-          onChange={(item) => setCategory(item.value)}
-        />
+          {/* Category Dropdown */}
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Category *</Text>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderText}
+              selectedTextStyle={styles.dropdownText}
+              data={categories}
+              labelField="label"
+              valueField="value"
+              placeholder="Select club category"
+              value={category}
+              onChange={(item) => setCategory(item.value)}
+            />
+          </View>
+        </View>
 
-        {/* Sign Up Button */}
-        <TouchableOpacity style={[styles.button, styles.signupButton]} onPress={onSubmit}>
-          <Text style={[styles.buttonText, styles.signupText]}>Sign Up</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          {/* Sign Up Button */}
+          <TouchableOpacity style={styles.signupButton} onPress={onSubmit}>
+            <Text style={styles.signupText}>Create Club Account</Text>
+          </TouchableOpacity>
 
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={[styles.button, styles.backButton]}
-        >
-          <Text style={[styles.buttonText, styles.backText]}>Back</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+          {/* Back Button */}
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backText}>Back to Options</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  overlay: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-    width: "100%",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 10,
-    textShadowColor: "rgba(0,0,0,0.4)",
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 6,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#eee",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  input: {
-    width: "80%",
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    color: "#fff",
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
-  },
-  dropdown: {
-    width: "80%",
-    backgroundColor: "rgba(255,255,255,0.15)",
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.3)",
-  },
-  label: {
-    color: "#fff",
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 5,
-  },
-  button: {
-    width: 220,
-    paddingVertical: 12,
-    borderRadius: 25,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  signupButton: {
-    backgroundColor: "#000",
-  },
-  backButton: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#000",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  signupText: {
-    color: "#fff",
-  },
-  backText: {
-    color: "#000",
-  },
-});

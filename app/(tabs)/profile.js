@@ -1,5 +1,6 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MapPin, GraduationCap, BookOpen, Star, Calendar, Trophy } from 'lucide-react-native';
+import { BookOpen, Calendar, GraduationCap, MapPin, Star, Trophy } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   Alert,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
 
 // Mock user data
 const mockUser = {

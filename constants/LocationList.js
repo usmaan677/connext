@@ -18,3 +18,8 @@ export const locationList = [
     longitude: -95.3455,
   },
 ];
+
+// Add default export to fix the route error
+export default function LocationListScreen() {
+  return null; // This can be a placeholder since it seems to be just data
+}
