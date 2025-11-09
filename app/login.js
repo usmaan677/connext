@@ -1,8 +1,9 @@
 import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -14,18 +15,113 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Error", "Please fill in all fields");
+      Alert.alert("Missing Information", "Please fill in all fields");
       return;
     }
 
-    setIsLoading(true);
-    // Simulate login process
-    setTimeout(() => {
+    if (password.length < 6) {
+      Alert.alert("Invalid Password", "Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (error) {
+        // Handle specific error cases
+        if (error.message.includes('Invalid login credentials')) {
+          Alert.alert(
+            "Login Failed",
+            "Invalid email or password. Please check your credentials and try again."
+          );
+        } else if (error.message.includes('Email not confirmed')) {
+          Alert.alert(
+            "Email Not Verified",
+            "Please check your email and click the verification link before signing in.",
+            [
+              { text: "Cancel" },
+              { text: "Resend Email", onPress: () => resendVerificationEmail() }
+            ]
+          );
+        } else if (error.message.includes('rate limit')) {
+          Alert.alert(
+            "Too Many Attempts",
+            "You've tried signing in too many times. Please wait a few minutes before trying again."
+          );
+        } else {
+          Alert.alert("Sign In Failed", error.message);
+        }
+        return;
+      }
+
+      if (data.user && data.session) {
+        // Successfully signed in
+        Alert.alert("Welcome back!", "You have successfully signed in.", [
+          { text: "OK", onPress: () => router.replace("/(tabs)/home") }
+        ]);
+      } else {
+        Alert.alert("Sign In Failed", "An unexpected error occurred. Please try again.");
+      }
+
+    } catch (e) {
+      Alert.alert("Unexpected Error", e?.message ?? "Something went wrong. Please try again.");
+    } finally {
       setIsLoading(false);
-      Alert.alert("Success", "Login successful!", [
-        { text: "OK", onPress: () => router.replace("/(tabs)/home") }
-      ]);
-    }, 1500);
+    }
+  };
+
+  const resendVerificationEmail = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email address first.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: "uhclubs://auth/callback"
+        }
+      });
+
+      if (error) {
+        Alert.alert("Error", "Failed to resend verification email. Please try again later.");
+      } else {
+        Alert.alert("Email Sent", "Verification email has been resent. Please check your inbox.");
+      }
+    } catch (_error) {
+      Alert.alert("Error", "Failed to resend verification email. Please try again later.");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert("Enter Email", "Please enter your email address first, then tap 'Forgot Password?' again.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: "uhclubs://auth/callback"
+      });
+
+      if (error) {
+        Alert.alert("Error", "Failed to send password reset email. Please check your email address and try again.");
+      } else {
+        Alert.alert(
+          "Check Your Email",
+          "We've sent you a password reset link. Please check your inbox and follow the instructions."
+        );
+      }
+    } catch (_error) {
+      Alert.alert("Error", "Failed to send password reset email. Please try again later.");
+    }
   };
 
   const styles = StyleSheet.create({
@@ -206,6 +302,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
+                autoCorrect={false}
               />
             </View>
           </View>
@@ -237,7 +334,7 @@ export default function LoginScreen() {
           </View>
 
           {/* Forgot Password */}
-          <TouchableOpacity style={styles.forgotPassword}>
+          <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
@@ -249,9 +346,12 @@ export default function LoginScreen() {
             onPress={handleLogin}
             disabled={isLoading}
           >
-            <Text style={styles.loginText}>
-              {isLoading ? "Signing In..." : "Sign In"}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.loginText}>
+                {isLoading ? "Signing In..." : "Sign In"}
+              </Text>
+              {isLoading && <ActivityIndicator color="#FFFFFF" style={{ marginLeft: 8 }} />}
+            </View>
           </TouchableOpacity>
 
           {/* Back Button */}
@@ -272,7 +372,7 @@ export default function LoginScreen() {
 
         {/* Sign Up Prompt */}
         <View style={styles.signupPrompt}>
-          <Text style={styles.signupText}>Don't have an account?</Text>
+          <Text style={styles.signupText}>Don&apos;t have an account?</Text>
           <TouchableOpacity onPress={() => router.push("/signup")}>
             <Text style={styles.signupLink}>Sign Up</Text>
           </TouchableOpacity>
