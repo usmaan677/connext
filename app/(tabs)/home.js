@@ -7,26 +7,38 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "rea
 const posts = [
   {
     id: 1,
-    username: "uh_cs_club",
-    userAvatar: "https://picsum.photos/40/40?random=10",
-    image: "https://picsum.photos/340/340?random=1",
-    caption: "Join us for our weekly coding workshop! 🚀"
+    username: "umr_houston",
+    userAvatar: "https://picsum.photos/40/40?random=99",
+    image: require("../../assets/images/umrflyer.png"),
+    caption:
+      "Join us this Sunday at 12PM for our annual Run4Palestine 5K! 🏃‍♂️🇵🇸 "
+      + "All proceeds will go toward humanitarian aid efforts in Palestine. "
+      + "Bring your friends, family, and good vibes — let’s make a difference together ❤️ "
+      + "#UMR #Run4Palestine #CharityRun #HoustonEvents",
   },
   {
     id: 2,
-    username: "uh_gaming",
-    userAvatar: "https://picsum.photos/40/40?random=20",
-    image: "https://picsum.photos/340/340?random=2",
-    caption: "Tournament this Friday - prizes for winners! 🎮"
+    username: "uh_cs_club",
+    userAvatar: "https://picsum.photos/40/40?random=10",
+    image: "https://picsum.photos/340/340?random=1",
+    caption: "Join us for our weekly coding workshop! 🚀",
   },
   {
     id: 3,
+    username: "uh_gaming",
+    userAvatar: "https://picsum.photos/40/40?random=20",
+    image: "https://picsum.photos/340/340?random=2",
+    caption: "Tournament this Friday — prizes for winners! 🎮",
+  },
+  {
+    id: 4,
     username: "uh_entrepreneurs",
     userAvatar: "https://picsum.photos/40/40?random=30",
     image: "https://picsum.photos/340/340?random=3",
-    caption: "Pitch competition applications now open 💡"
-  }
+    caption: "Pitch competition applications now open 💡",
+  },
 ];
+
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -207,7 +219,15 @@ export default function HomeScreen() {
             </View>
 
             {/* Post Image */}
-            <Image source={{ uri: post.image }} style={styles.postImage} />
+            <Image
+              source={
+                typeof post.image === "number"
+                  ? post.image // local require() → your umrflyer.png
+                  : { uri: post.image } // remote image (like picsum)
+              }
+              style={styles.postImage}
+            />
+
 
             {/* Actions Row - Like, Comment, Share left; Bookmark right */}
             <View style={styles.postActionsRow}>
