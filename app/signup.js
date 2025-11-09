@@ -17,38 +17,39 @@ export default function SignupChoice() {
     overlay: { 
       alignItems: "center", 
       paddingHorizontal: 24, 
-      paddingTop: 80, // Increased from 40 to 80 for more space
+      paddingTop: 60, // Reduced from 80 to fit better on screen
+      paddingBottom: 20, // Added bottom padding
       width: "100%",
       flex: 1,
       justifyContent: "center"
     },
     headerSection: {
       alignItems: "center",
-      marginBottom: 48,
+      marginBottom: 32, // Reduced from 48
     },
     title: {
-      fontSize: 36,
+      fontSize: 32, // Reduced from 36
       fontWeight: "800",
       color: colors.text,
-      marginBottom: 16,
+      marginBottom: 12, // Reduced from 16
       textAlign: "center",
     },
     subtitle: { 
-      fontSize: 18, 
+      fontSize: 16, // Reduced from 18
       color: colors.textSecondary, 
       textAlign: "center",
-      lineHeight: 24,
+      lineHeight: 22, // Reduced from 24
       paddingHorizontal: 16,
     },
     cardsContainer: {
       width: "100%",
       maxWidth: 340,
-      gap: 20,
+      gap: 16, // Reduced from 20
     },
     card: {
       backgroundColor: colors.card,
-      borderRadius: 24,
-      padding: 32,
+      borderRadius: 20, // Reduced from 24
+      padding: 24, // Reduced from 32
       alignItems: "center",
       borderWidth: 1,
       borderColor: colors.border,
@@ -65,13 +66,13 @@ export default function SignupChoice() {
       borderColor: colors.accent,
     },
     cardIcon: {
-      width: 72,
-      height: 72,
+      width: 60, // Reduced from 72
+      height: 60, // Reduced from 72
       backgroundColor: colors.primary,
-      borderRadius: 36,
+      borderRadius: 30, // Reduced from 36
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: 20,
+      marginBottom: 16, // Reduced from 20
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
@@ -83,22 +84,37 @@ export default function SignupChoice() {
       shadowColor: colors.accent,
     },
     cardTitle: {
-      fontSize: 24,
+      fontSize: 20, // Reduced from 24
       fontWeight: "700",
       color: colors.text,
-      marginBottom: 8,
+      marginBottom: 6, // Reduced from 8
       textAlign: "center",
     },
     cardDescription: {
-      fontSize: 16,
+      fontSize: 14, // Reduced from 16
       color: colors.textSecondary,
       textAlign: "center",
-      lineHeight: 22,
+      lineHeight: 20, // Reduced from 22
+    },
+    signInPrompt: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 24, // Reduced from original placement
+    },
+    signInText: {
+      color: colors.textSecondary,
+      fontSize: 15,
+      marginRight: 8,
+    },
+    signInLink: {
+      color: colors.primary,
+      fontSize: 15,
+      fontWeight: "600",
     },
     guestButton: {
-      marginTop: 40,
-      paddingVertical: 16,
-      paddingHorizontal: 32,
+      marginTop: 16, // Reduced from 40
+      paddingVertical: 14, // Reduced from 16
+      paddingHorizontal: 28, // Reduced from 32
       backgroundColor: colors.surface,
       borderRadius: 16,
       borderWidth: 1,
@@ -106,7 +122,7 @@ export default function SignupChoice() {
     },
     guestText: {
       color: colors.textSecondary,
-      fontSize: 16,
+      fontSize: 15, // Reduced from 16
       fontWeight: "600",
       textAlign: "center",
     },
@@ -153,6 +169,14 @@ export default function SignupChoice() {
             <Text style={styles.cardDescription}>
               Promote your club and manage events
             </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Sign In Prompt */}
+        <View style={styles.signInPrompt}>
+          <Text style={styles.signInText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/login")}>
+            <Text style={styles.signInLink}>Sign In</Text>
           </TouchableOpacity>
         </View>
 

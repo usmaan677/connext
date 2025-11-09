@@ -53,7 +53,7 @@ export default function HomeScreen() {
       flexDirection: 'row',
       alignItems: 'flex-end',
       justifyContent: 'space-between',
-      paddingTop: 54, // Added 4px more padding
+      paddingTop: 70, // Increased from 54 to 70 for more space from top
       paddingHorizontal: 20,
       paddingBottom: 16,
       backgroundColor: colors.header,
@@ -106,6 +106,7 @@ export default function HomeScreen() {
       fontWeight: '600',
     },
     feedContent: {
+      paddingTop: 20, // Added top padding for spacing between header and posts
       paddingBottom: 40,
     },
     postCard: {

@@ -1,8 +1,9 @@
+import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ClubSignupScreen() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function ClubSignupScreen() {
   const [clubpassword, setClubPassword] = useState("");
   const [linktree, setLinktree] = useState("");
   const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const categories = [
     { label: "Academic", value: "academic" },
@@ -22,14 +24,121 @@ export default function ClubSignupScreen() {
     { label: "Social", value: "social" },
   ];
 
-  const onSubmit = () => {
+  function validate() {
     if (!clubname || !clubemail || !clubpassword || !category) {
-      alert("Please fill in all required fields.");
-      return;
+      Alert.alert("Missing info", "Please fill in all required fields.");
+      return false;
     }
-    alert("Club signed up successfully!");
-    // Navigate to main app after successful signup
-    router.replace("/(tabs)/home");
+    if (clubpassword.length < 6) {
+      Alert.alert("Weak password", "Password should be at least 6 characters.");
+      return false;
+    }
+    return true;
+  }
+
+  const onSubmit = async () => {
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+
+      // Sign up with metadata and proper redirect URL for email verification
+      const { data, error } = await supabase.auth.signUp({
+        email: clubemail,
+        password: clubpassword,
+        options: {
+          // Use the deep link redirect URL we configured
+          emailRedirectTo: "uhclubs://auth/callback",
+          data: {
+            club_name: clubname,
+            linktree,
+            category,
+            role: "club",
+          },
+        },
+      });
+
+      if (error) {
+        // Handle specific error cases
+        if (error.message.includes('rate limit')) {
+          Alert.alert(
+            "Too Many Attempts",
+            "You've tried signing up too many times recently. Please wait a few minutes before trying again."
+          );
+        } else if (error.message.includes('already registered')) {
+          Alert.alert(
+            "Account Exists",
+            "This email is already registered. Try signing in instead.",
+            [
+              { text: "Cancel" },
+              { text: "Go to Login", onPress: () => router.push("/login") }
+            ]
+          );
+        } else {
+          Alert.alert("Sign up failed", error.message);
+        }
+        return;
+      }
+
+      // Check if user already exists and is confirmed
+      if (data.user && data.session) {
+        // User is immediately confirmed (email confirmation disabled)
+        const { error: insertError } = await supabase.from("profiles").insert({
+          id: data.user.id,
+          club_name: clubname,
+          email: clubemail,
+          linktree,
+          category,
+          role: "club",
+        });
+
+        if (insertError) {
+          console.warn("Profile insert error:", insertError);
+        }
+
+        Alert.alert("Welcome!", "Your club account has been created.");
+        router.replace("/(tabs)/home");
+        return;
+      }
+
+      // If no session, email confirmation is required
+      if (data.user && !data.session) {
+        Alert.alert(
+          "Check your email! 📧",
+          `We've sent a verification link to ${clubemail}. Please:\n\n1. Check your inbox (and spam folder)\n2. Click the verification link\n3. The link will open this app automatically\n\nIf you don't receive the email within 5 minutes, try signing up again or check your spam folder.`,
+          [
+            { text: "Resend Email", onPress: () => resendVerificationEmail() },
+            { text: "OK", onPress: () => router.replace("/login") }
+          ]
+        );
+        return;
+      }
+
+    } catch (e) {
+      Alert.alert("Unexpected error", e?.message ?? "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendVerificationEmail = async () => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: clubemail,
+        options: {
+          emailRedirectTo: "uhclubs://auth/callback"
+        }
+      });
+
+      if (error) {
+        Alert.alert("Error", "Failed to resend email. Please try again later.");
+      } else {
+        Alert.alert("Email Sent", "Verification email has been resent. Please check your inbox.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to resend email. Please try again later.");
+    }
   };
 
   const styles = StyleSheet.create({
@@ -237,8 +346,12 @@ export default function ClubSignupScreen() {
 
         <View style={styles.buttonContainer}>
           {/* Sign Up Button */}
-          <TouchableOpacity style={styles.signupButton} onPress={onSubmit}>
-            <Text style={styles.signupText}>Create Club Account</Text>
+          <TouchableOpacity style={styles.signupButton} onPress={onSubmit} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.signupText}>Create Club Account</Text>
+            )}
           </TouchableOpacity>
 
           {/* Back Button */}

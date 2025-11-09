@@ -16,6 +16,7 @@ import {
 import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
 import { Modalize } from "react-native-modalize";
 import PagerView from "react-native-pager-view";
+import { locationList } from "../../constants/LocationList";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
