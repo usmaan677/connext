@@ -37,14 +37,22 @@ export default function LoginScreen() {
 
     try {
       setIsLoading(true);
+      console.log("🔄 Starting login attempt for:", normEmail);
 
+      // Try direct authentication without connectivity test
+      console.log("🔐 Attempting direct authentication...");
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: normEmail,
         password,
       });
 
+      console.log("📡 Authentication response received");
+      
       if (error) {
+        console.log("🚨 Authentication error:", error.message);
         const msg = error.message || "";
+        
         if (msg.includes("Invalid login credentials")) {
           Alert.alert("Login Failed", "Invalid email or password. Please try again.");
         } else if (msg.includes("Email not confirmed")) {
@@ -58,6 +66,8 @@ export default function LoginScreen() {
           );
         } else if (msg.toLowerCase().includes("rate limit")) {
           Alert.alert("Too Many Attempts", "Please wait a few minutes and try again.");
+        } else if (msg.includes("fetch")) {
+          Alert.alert("Connection Error", "Unable to connect to the server. Please check your internet connection and try again.");
         } else {
           Alert.alert("Sign In Failed", msg);
         }
@@ -65,14 +75,28 @@ export default function LoginScreen() {
       }
 
       if (data?.user && data?.session) {
-        // AuthSync at the app root will upsert the profile if needed
+        console.log("🎉 Login successful! User ID:", data.user.id);
+        console.log("📝 User metadata:", data.user.user_metadata);
         router.replace("/(tabs)/home");
       } else {
+        console.log("⚠️ Login response missing user or session data");
         Alert.alert("Sign In Failed", "An unexpected error occurred. Please try again.");
       }
+      
     } catch (e) {
-      Alert.alert("Unexpected Error", e?.message ?? "Something went wrong. Please try again.");
+      console.log("💥 Unexpected login error:", e);
+      const errorMsg = e?.message || "Unknown error";
+      
+      if (errorMsg.includes("fetch") || errorMsg.includes("network") || errorMsg.includes("timeout")) {
+        Alert.alert(
+          "Network Error", 
+          "Unable to connect to the server. Please check your internet connection and try again."
+        );
+      } else {
+        Alert.alert("Unexpected Error", errorMsg);
+      }
     } finally {
+      console.log("🏁 Login attempt finished");
       setIsLoading(false);
     }
   };
@@ -188,7 +212,7 @@ export default function LoginScreen() {
         signupText: { color: colors.textSecondary, fontSize: 15 },
         signupLink: { color: colors.primary, fontSize: 15, fontWeight: "600", marginLeft: 4 },
       }),
-    [colors, isLoading]
+    [colors]
   );
 
   return (

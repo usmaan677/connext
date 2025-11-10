@@ -90,6 +90,23 @@ export default function StudentSignupScreen() {
         return;
       }
 
+      // Always try to create the profile after successful signup
+      if (data.user) {
+        const { error: insertError } = await supabase.from("profiles").insert({
+          user_id: data.user.id,  // ← Changed from id to user_id
+          full_name: fullname,
+          email,
+          year,
+          major,
+          role: "student",
+        });
+
+        if (insertError) {
+          console.warn("Profile insert error:", insertError);
+          // Don't show error to user as the account was still created successfully
+        }
+      }
+
       // If confirmations are OFF (dev), session exists; best-effort profile upsert here.
       if (data?.user && data?.session) {
         await supabase
@@ -103,7 +120,7 @@ export default function StudentSignupScreen() {
               major,
               role: "student",
             },
-            { onConflict: "id" }
+            { onConflict: "user_id" }
           );
         Alert.alert("Welcome!", "Your student account has been created.");
         router.replace("/(tabs)/home");

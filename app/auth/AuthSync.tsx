@@ -9,7 +9,7 @@ export default function AuthSync() {
         const u = session.user;
         const m = u.user_metadata ?? {};
         const payload = {
-          user_id: u.id,                 // or user_id: u.id (match your schema)
+          user_id: u.id,                 // ← Changed from id to user_id
           email: u.email,
           full_name: m.full_name ?? "",
           year: m.year ?? null,
@@ -17,14 +17,11 @@ export default function AuthSync() {
           role: m.role ?? "student",
         };
         // fire-and-forget; don't await
-        supabase.from("profiles").upsert(payload, { onConflict: "id" })
+        supabase.from("profiles").upsert(payload, { onConflict: "user_id" }) // ← Changed onConflict to user_id
           .then(({ error }) => { 
-            if (error) {
-              console.log("profiles upsert error:", error);
-            }
-          }, (e: any) => {
-            console.log("profiles upsert exception:", e);
-          });
+            if (error) console.log("profiles upsert error:", error); 
+          })
+          .catch((e: any) => console.log("profiles upsert exception:", e));
       }
     });
     return () => subscription.subscription.unsubscribe();
