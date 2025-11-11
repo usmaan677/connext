@@ -1,15 +1,15 @@
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { useEnsureProfile } from "@/hooks/useEnsureProfile";
+// import { useEnsureProfile } from "@/hooks/useEnsureProfile";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import AuthSync from "@/app/auth/AuthSync";
+// import AuthSync from "@/app/auth/AuthSync";
 
 export default function RootLayout() {
-  useEnsureProfile();
+  // useEnsureProfile();
   return (
     
     <ThemeProvider>
-      <AuthSync />
+      {/* <AuthSync /> */}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="login" />

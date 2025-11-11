@@ -1,19 +1,42 @@
+import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import "../global.css";
 
 export default function HomeScreen() {
-  useEffect(() => {
-    // Add a small delay to ensure the layout is mounted before navigation
-    const timer = setTimeout(() => {
-      router.replace("/signup");
-    }, 100);
+  const [loading, setLoading] = useState(true);
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    checkAuthStatus();
   }, []);
 
-  // Show loading screen briefly while redirecting
+  const checkAuthStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Add a small delay to ensure the layout is mounted before navigation
+      setTimeout(() => {
+        if (session?.user) {
+          // User is authenticated, go to home tabs
+          router.replace("/(tabs)/home");
+        } else {
+          // User is not authenticated, go to signup
+          router.replace("/signup");
+        }
+      }, 100);
+    } catch (error) {
+      console.log("Auth check error:", error);
+      // On error, default to signup
+      setTimeout(() => {
+        router.replace("/signup");
+      }, 100);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show loading screen briefly while checking auth and redirecting
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8FAFC' }}>
       <ActivityIndicator size="large" color="#3B82F6" />

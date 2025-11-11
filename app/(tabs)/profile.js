@@ -1,7 +1,9 @@
 import { useTheme } from '@/contexts/ThemeContext';
+import { supabase } from '@/lib/supabase';
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BookOpen, Calendar, GraduationCap, MapPin, Star, Trophy, X, Camera } from 'lucide-react-native';
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { BookOpen, Calendar, Camera, GraduationCap, LogOut, MapPin, Star, Trophy, X } from 'lucide-react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -15,9 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { supabase } from '@/lib/supabase';
 import { Dropdown } from "react-native-element-dropdown";
-import * as ImagePicker from 'expo-image-picker';
 
 // (Optional) still using mock clubs until you have a clubs/memberships table
 const mockClubs = [
@@ -76,7 +76,10 @@ export default function Profile() {
       setAuthUser(session?.user ?? null);
     });
 
-    return () => sub?.subscription?.unsubscribe?.();
+    return () => {
+      mounted = false;
+      sub?.subscription?.unsubscribe?.();
+    };
   }, []);
 
   const userId = authUser?.id || null;
@@ -88,7 +91,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', userId) // ← Changed back to 'user_id' to match your schema
+        .eq('user_id', userId)
         .single();
 
       if (error) {
@@ -110,7 +113,7 @@ export default function Profile() {
       .channel('profiles-realtime')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${userId}` }, // ← Changed back to 'user_id'
+        { event: '*', schema: 'public', table: 'profiles', filter: `user_id=eq.${userId}` },
         (payload) => {
           if (payload.new) setProfile(payload.new);
         }
@@ -127,6 +130,33 @@ export default function Profile() {
     await fetchProfile();
     setRefreshing(false);
   }, [userId, fetchProfile]);
+
+  // ---------- Sign out function ----------
+  const handleSignOut = async () => {
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Sign Out", 
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const { error } = await supabase.auth.signOut();
+              if (error) {
+                Alert.alert("Error", "Failed to sign out. Please try again.");
+              } else {
+                Alert.alert("Signed Out", "You have been successfully signed out.");
+              }
+            } catch (e) {
+              Alert.alert("Error", "Failed to sign out. Please try again.");
+            }
+          }
+        }
+      ]
+    );
+  };
 
   // ---------- Derived UI values ----------
   const name = profile?.full_name || authUser?.user_metadata?.full_name || '—';
@@ -506,6 +536,31 @@ export default function Profile() {
       marginLeft: 8,
       fontWeight: '600',
     },
+    signOutButton: {
+      marginHorizontal: 20, 
+      marginTop: 8, 
+      marginBottom: 12,
+      borderRadius: 20, 
+      overflow: 'hidden',
+      shadowColor: colors.error, 
+      shadowOffset: { width: 0, height: 6 }, 
+      shadowOpacity: 0.3, 
+      shadowRadius: 12, 
+      elevation: 8,
+    },
+    signOutButtonGradient: { 
+      paddingVertical: 20, 
+      paddingHorizontal: 32, 
+      alignItems: 'center', 
+      flexDirection: 'row', 
+      justifyContent: 'center' 
+    },
+    signOutButtonText: { 
+      color: '#ffffff', 
+      fontSize: 17, 
+      fontWeight: '700', 
+      marginLeft: 8 
+    },
   }), [colors]);
 
   // ---------- Loading / Signed-out states ----------
@@ -668,6 +723,23 @@ export default function Profile() {
             style={styles.editButtonGradient}
           >
             <Text style={styles.editButtonText}>✨ Edit Profile</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Sign Out Button */}
+        <TouchableOpacity
+          style={styles.signOutButton}
+          onPress={handleSignOut}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[colors.error, colors.errorDark || '#cc4444']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.signOutButtonGradient}
+          >
+            <LogOut size={20} color="#ffffff" />
+            <Text style={styles.signOutButtonText}>Sign Out</Text>
           </LinearGradient>
         </TouchableOpacity>
       </ScrollView>

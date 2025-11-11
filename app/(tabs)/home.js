@@ -1,6 +1,8 @@
 import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/lib/supabase";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Mock posts data
@@ -39,10 +41,69 @@ const posts = [
   },
 ];
 
-
 export default function HomeScreen() {
   const router = useRouter();
   const { colors, toggleTheme, theme } = useTheme();
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    // Get initial session and profile
+    const getSessionAndProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        
+        // Fetch user profile from database
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('photo_url')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (profileData) {
+          setProfile(profileData);
+        }
+      }
+    };
+
+    getSessionAndProfile();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          
+          // Fetch profile when user signs in
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('photo_url')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (profileData) {
+            setProfile(profileData);
+          }
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, []);
+
+  const handleProfilePress = () => {
+    if (user) {
+      // Navigate to profile tab
+      router.push('/(tabs)/profile');
+    } else {
+      // Navigate to login
+      router.push('/login');
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -91,6 +152,13 @@ export default function HomeScreen() {
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    profilePicture: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      borderWidth: 2,
+      borderColor: colors.primary,
     },
     signInBtnNew: {
       flexDirection: 'row',
@@ -155,23 +223,17 @@ export default function HomeScreen() {
     leftActions: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 4,
     },
     iconButton: {
       padding: 8,
-      borderRadius: 20,
-      backgroundColor: 'transparent',
     },
     postCaption: {
+      paddingHorizontal: 16,
+      paddingBottom: 16,
       color: colors.text,
-      fontSize: 15,
-      lineHeight: 20,
-      marginHorizontal: 16,
-      marginBottom: 16,
     },
     captionUsernameBold: {
-      fontWeight: '700',
-      color: colors.text,
+      fontWeight: '600',
     },
   });
 
@@ -195,26 +257,40 @@ export default function HomeScreen() {
               color={colors.icon} 
             />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.signInBtnNew}
-            onPress={() => router.push('/login')}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.signInBtnLabel}>Sign In</Text>
-          </TouchableOpacity>
+          
+          {user ? (
+            <TouchableOpacity
+              onPress={handleProfilePress}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={{ 
+                  uri: profile?.photo_url || 
+                       user?.user_metadata?.photo_url || 
+                       'https://placekitten.com/200/200' 
+                }}
+                style={styles.profilePicture}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.signInBtnNew}
+              onPress={handleProfilePress}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.signInBtnLabel}>Sign In</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.feedContent} showsVerticalScrollIndicator={false}>
-        {/* Instagram-style feed */}
-        {posts.map(post => (
+      {/* Feed Content */}
+      <ScrollView contentContainerStyle={styles.feedContent}>
+        {posts.map((post) => (
           <View key={post.id} style={styles.postCard}>
-            {/* User Header */}
+            {/* Post Header */}
             <View style={styles.postHeader}>
-              <Image 
-                source={{ uri: post.userAvatar }} 
-                style={styles.userAvatar}
-              />
+              <Image source={{ uri: post.userAvatar }} style={styles.userAvatar} />
               <Text style={styles.postUsername}>@{post.username}</Text>
             </View>
 
@@ -227,7 +303,6 @@ export default function HomeScreen() {
               }
               style={styles.postImage}
             />
-
 
             {/* Actions Row - Like, Comment, Share left; Bookmark right */}
             <View style={styles.postActionsRow}>
