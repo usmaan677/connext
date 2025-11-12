@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -16,7 +17,6 @@ import {
 import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE } from "react-native-maps";
 import { Modalize } from "react-native-modalize";
 import PagerView from "react-native-pager-view";
-import { locationList } from "../../constants/LocationList";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -32,7 +32,6 @@ const locations = [
       caption:
         "We’re so excited to see everyone this Sunday for Run4Palestine! ❤️ All proceeds go toward humanitarian aid for families in Gaza. Don’t forget to bring your water bottles and good vibes 🇵🇸.",
       image: require("../../assets/images/umrflyer.png"),
-      ig: "https://www.instagram.com/umr_houston/",
     },
   },
   {
@@ -46,7 +45,6 @@ const locations = [
       caption:
         "Join us for our weekly coding workshop! 🚀 Bring your laptops and dive into hands-on programming with peers.",
       image: { uri: "https://picsum.photos/340/340?random=1" },
-      ig: "https://www.instagram.com/uh_cs_club/",
     },
   },
 ];
@@ -59,6 +57,7 @@ const INITIAL_REGION = {
 };
 
 export default function MapScreen() {
+  const router = useRouter();
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [activeMarker, setActiveMarker] = useState(0);
   const mapRef = useRef(null);
@@ -128,8 +127,8 @@ export default function MapScreen() {
                 width: 55,
                 height: 55,
                 borderRadius: 28,
-                borderWidth: 2,
-                borderColor: activeMarker === index ? "#ff5252" : "#fff",
+                borderWidth: 3,
+                borderColor: activeMarker === index ? "#ff3b30" : "#fff",
               }}
             />
           </Marker>
@@ -141,7 +140,7 @@ export default function MapScreen() {
         ref={modalizeRef}
         snapPoint={SCREEN_HEIGHT * 0.35}
         modalHeight={SCREEN_HEIGHT * 0.85}
-        overlayStyle={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+        overlayStyle={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         handleStyle={{ backgroundColor: "#555" }}
         modalStyle={styles.bottomSheet}
         onClosed={() => setActiveMarker(null)}
@@ -152,47 +151,74 @@ export default function MapScreen() {
           initialPage={0}
           onPageSelected={handlePageSelected}
         >
-          {locations.map((loc, index) => (
+          {locations.map((loc) => (
             <ScrollView
               key={loc.id}
               style={{ flex: 1 }}
-              contentContainerStyle={{ paddingBottom: 60 }}
+              contentContainerStyle={{ paddingBottom: 80 }}
               showsVerticalScrollIndicator={false}
             >
-              {/* Close Button */}
-              <Pressable
-                style={styles.closeBtn}
-                onPress={() => modalizeRef.current?.close()}
-              >
-                <Ionicons name="close" size={22} color="#fff" />
-              </Pressable>
+              {/* Header Row */}
+              <View style={styles.headerRow}>
+                <Text style={styles.cardTitle}>{loc.name}</Text>
+                <Pressable
+                  style={styles.closeBtn}
+                  onPress={() => modalizeRef.current?.close()}
+                >
+                  <Ionicons name="close" size={20} color="#fff" />
+                </Pressable>
+              </View>
 
-              {/* Title */}
-              <Text style={styles.cardTitle}>{loc.name}</Text>
-
-              {/* Post */}
+              {/* Post Container */}
               <View style={styles.postContainer}>
                 <View style={styles.postHeader}>
-                  <Image
-                    source={{ uri: loc.post.avatar }}
-                    style={styles.userAvatar}
-                  />
+                  <Image source={{ uri: loc.post.avatar }} style={styles.userAvatar} />
                   <Text style={styles.postUsername}>@{loc.post.username}</Text>
                 </View>
 
-                <Image source={loc.post.image} style={styles.postImage} />
+                {/* Pressable Image + Caption */}
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: "/post",
+                      params: {
+                        name: loc.name,
+                        username: loc.post.username,
+                        avatar: loc.post.avatar,
+                        caption: loc.post.caption,
+                        image:
+                          typeof loc.post.image === "number"
+                            ? "local"
+                            : loc.post.image.uri,
+                      },
+                    })
+                  }
+                  android_ripple={{ color: "rgba(255,255,255,0.1)" }}
+                  style={{ borderRadius: 16, overflow: "hidden" }}
+                >
+                  <View style={styles.imageWrapper}>
+                    <Image source={loc.post.image} style={styles.postImage} />
+                    <View style={styles.gradientOverlay} />
 
-                <Text style={styles.postCaption}>
-                  <Text style={{ fontWeight: "700", color: "#fff" }}>
-                    {loc.post.username}
-                  </Text>{" "}
-                  {loc.post.caption}
-                </Text>
+                    {/* In-App View Badge */}
+                    <View style={styles.igBadge}>
+                      <Ionicons name="image-outline" size={14} color="#fff" />
+                      <Text style={styles.igBadgeText}>View Post</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.postCaption}>
+                    <Text style={{ fontWeight: "700", color: "#fff" }}>
+                      {loc.post.username}
+                    </Text>{" "}
+                    {loc.post.caption}
+                  </Text>
+                </Pressable>
 
                 {/* Buttons */}
                 <View style={styles.actionRow}>
                   <Pressable
-                    style={styles.actionButton}
+                    style={[styles.actionButton, { backgroundColor: "#2ecc71" }]}
                     onPress={() => {
                       const url = Platform.select({
                         ios: `http://maps.apple.com/?daddr=${loc.latitude},${loc.longitude}`,
@@ -203,14 +229,6 @@ export default function MapScreen() {
                   >
                     <Ionicons name="navigate" size={20} color="#fff" />
                     <Text style={styles.actionLabel}>Directions</Text>
-                  </Pressable>
-
-                  <Pressable
-                    style={styles.actionButton}
-                    onPress={() => Linking.openURL(loc.post.ig)}
-                  >
-                    <Ionicons name="logo-instagram" size={20} color="#fff" />
-                    <Text style={styles.actionLabel}>Instagram</Text>
                   </Pressable>
                 </View>
               </View>
@@ -227,16 +245,21 @@ const styles = StyleSheet.create({
   map: { ...StyleSheet.absoluteFillObject },
   bottomSheet: {
     backgroundColor: "#1c1c1e",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     paddingBottom: 20,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    marginTop: 14,
   },
   closeBtn: {
     position: "absolute",
-    top: 10,
-    right: 14,
-    zIndex: 10,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    right: 16,
+    backgroundColor: "rgba(255,255,255,0.1)",
     padding: 6,
     borderRadius: 20,
   },
@@ -245,18 +268,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "800",
     textAlign: "center",
-    marginTop: 20,
-    marginBottom: 16,
   },
   postContainer: {
     backgroundColor: "#222",
-    borderRadius: 16,
+    borderRadius: 18,
     marginHorizontal: 16,
+    marginTop: 20,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
   postHeader: {
     flexDirection: "row",
@@ -265,32 +287,45 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#333",
   },
-  userAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginRight: 10,
+  userAvatar: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
+  postUsername: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  imageWrapper: { position: "relative" },
+  postImage: { width: "100%", height: 240, resizeMode: "cover" },
+  gradientOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    backgroundColor: "rgba(0,0,0,0.25)",
   },
-  postUsername: {
+  igBadge: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  igBadgeText: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 11,
     fontWeight: "600",
-  },
-  postImage: {
-    width: "100%",
-    height: 240,
-    resizeMode: "cover",
   },
   postCaption: {
     color: "#eee",
-    fontSize: 14,
+    fontSize: 14.5,
     lineHeight: 20,
     padding: 14,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   actionRow: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
     alignItems: "center",
     paddingVertical: 14,
     backgroundColor: "#1c1c1e",
@@ -300,7 +335,6 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2c2c2e",
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 10,

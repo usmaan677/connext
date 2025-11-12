@@ -1,9 +1,10 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/lib/supabase";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 
 // Mock posts data
 const posts = [
@@ -42,10 +43,35 @@ const posts = [
 ];
 
 export default function HomeScreen() {
+  const [liked, setLiked] = useState(false);
   const router = useRouter();
   const { colors, toggleTheme, theme } = useTheme();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Check out this awesome app!', // Message to share
+        url: 'https://your-app-link.com', // Optional URL
+        title: 'My App', // Optional title for the share sheet
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+            // Shared successfully with result.activityType
+        } else {
+            // Shared successfully
+        }
+      } else if (result.action === Share.dismissedAction) {
+          // Share sheet dismissed
+      }
+    } catch (error) {
+      console.error('Error sharing:', error.message);
+    }
+  };
+
+
 
   useEffect(() => {
     // Get initial session and profile
@@ -307,14 +333,28 @@ export default function HomeScreen() {
             {/* Actions Row - Like, Comment, Share left; Bookmark right */}
             <View style={styles.postActionsRow}>
               <View style={styles.leftActions}>
-                <TouchableOpacity style={styles.iconButton}>
-                  <Feather name="heart" size={25} color={colors.icon} />
+                <TouchableOpacity
+                  onPress={() => setLiked(!liked)}
+                  activeOpacity={0.7}
+                  style={{ padding: 8 }}
+                >
+                  <Ionicons
+                    name={liked ? "heart" : "heart-outline"}
+                    size={26}
+                    color={liked ? "red" : "#D3D3D3"}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconButton}>
                   <Feather name="message-circle" size={25} color={colors.icon} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton}>
-                  <Feather name="send" size={24} color={colors.icon} style={{ transform: [{ rotate: "-10deg" }] }} />
+                
+                <TouchableOpacity onPress={onShare}>
+                  <Feather
+                    name="send"
+                    size={24}
+                    color={colors.icon}
+                    
+                  />
                 </TouchableOpacity>
               </View>
               <TouchableOpacity style={styles.iconButton}>
