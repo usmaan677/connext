@@ -1,9 +1,10 @@
 import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/lib/supabase";
+import * as FileSystem from "expo-file-system"; // base64 upload fix
 import * as ImagePicker from "expo-image-picker";
 import {
   ArrowLeft,
   Camera,
-  MapPin,
   X
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -24,12 +25,9 @@ const { width } = Dimensions.get("window");
 
 export default function Post() {
   const { colors } = useTheme();
+
   const [caption, setCaption] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
-  const [location, setLocation] = useState("");
-  const [pollQuestion, setPollQuestion] = useState("");
-  const [pollOptions, setPollOptions] = useState(["", ""]);
-  const [links, setLinks] = useState([""]);
   const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
@@ -39,6 +37,7 @@ export default function Post() {
   const requestPermissions = async () => {
     const cam = await ImagePicker.requestCameraPermissionsAsync();
     const lib = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
     if (cam.status !== "granted" || lib.status !== "granted") {
       Alert.alert("Permissions Required", "Enable camera and library access.");
     }
@@ -56,69 +55,104 @@ export default function Post() {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
       quality: 0.8,
     });
-    if (!result.canceled && result.assets?.[0])
+
+    if (!result.canceled && result.assets?.[0]) {
       setSelectedImages([result.assets[0].uri]);
+    }
   };
 
   const pickFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      selectionLimit: 10,
+      allowsMultipleSelection: false,
       quality: 0.8,
     });
+
     if (!result.canceled && result.assets) {
-      const newImgs = result.assets.map((a) => a.uri);
-      setSelectedImages((prev) => [...prev, ...newImgs].slice(0, 10));
+      setSelectedImages([result.assets[0].uri]);
     }
   };
 
-  const removeImage = (index) =>
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = () =>
+    setSelectedImages([]);
 
-  const handleShare = () => {
-    if (
-      !caption.trim() &&
-      selectedImages.length === 0 &&
-      !pollQuestion.trim() &&
-      links.every((l) => !l.trim())
-    ) {
-      Alert.alert("Nothing to post", "Add content before sharing.");
+  // --------------------------------
+  // 🚀 HANDLE SHARE → SAVE TO SUPABASE
+  // --------------------------------
+  const handleShare = async () => {
+    if (isPosting) return;
+
+    if (selectedImages.length === 0) {
+      Alert.alert("Error", "Please select an image.");
       return;
     }
+
     setIsPosting(true);
-    setTimeout(() => {
-      setIsPosting(false);
-      Alert.alert("Shared!", "Your post has been uploaded.");
+
+    try {
+      // 1️⃣ GET LOGGED-IN USER
+      const { data: auth } = await supabase.auth.getUser();
+      const user = auth.user;
+      if (!user) throw new Error("Not logged in.");
+
+      const userId = user.id;
+      const fullName = user.user_metadata.full_name || "Unknown";
+
+      // 2️⃣ READ IMAGE AS BASE64
+      const imageUri = selectedImages[0];
+
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const fileName = `${userId}-${Date.now()}.jpg`;
+
+      // 3️⃣ UPLOAD TO SUPABASE
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("post-images")
+        .upload(fileName, Buffer.from(base64, "base64"), {
+          contentType: "image/jpeg",
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 4️⃣ GET PUBLIC URL
+      const { data: pub } = supabase
+        .storage
+        .from("post-images")
+        .getPublicUrl(uploadData.path);
+
+      const imageUrl = pub.publicUrl;
+
+      // 5️⃣ INSERT TO POSTS TABLE
+      const { error: insertError } = await supabase.from("posts").insert({
+        caption,
+        photo_url: imageUrl,
+        full_name: fullName,
+        user_id: userId,
+      });
+
+      if (insertError) throw insertError;
+
+      Alert.alert("Success!", "Your post has been shared.");
+
+      // Reset UI
       setCaption("");
       setSelectedImages([]);
-      setPollQuestion("");
-      setPollOptions(["", ""]);
-      setLinks([""]);
-      setLocation("");
-    }, 1200);
+
+    } catch (err) {
+      console.log("POST ERROR:", err);
+      Alert.alert("Upload error", err.message);
+    }
+
+    setIsPosting(false);
   };
 
-  const addOption = () => setPollOptions([...pollOptions, ""]);
-  const removeOption = (i) =>
-    setPollOptions(pollOptions.filter((_, idx) => idx !== i));
-  const handleOptionChange = (i, text) => {
-    const updated = [...pollOptions];
-    updated[i] = text;
-    setPollOptions(updated);
-  };
-
-  const addLink = () => setLinks([...links, ""]);
-  const removeLink = (i) => setLinks(links.filter((_, idx) => idx !== i));
-  const handleLinkChange = (i, text) => {
-    const updated = [...links];
-    updated[i] = text;
-    setLinks(updated);
-  };
-
+  // --------------------------------
+  // UI STYLES
+  // --------------------------------
   const s = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     header: {
@@ -138,11 +172,9 @@ export default function Post() {
       paddingHorizontal: 18,
       paddingVertical: 8,
       borderRadius: 14,
-      shadowColor: colors.primary,
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
     },
     shareText: { color: "#fff", fontWeight: "600" },
+
     scroll: { flex: 1 },
 
     imageCard: {
@@ -171,6 +203,7 @@ export default function Post() {
       fontWeight: "500",
       textAlign: "center",
     },
+
     image: {
       width: "100%",
       height: width * 0.9,
@@ -191,9 +224,6 @@ export default function Post() {
       marginTop: 18,
       padding: 16,
       borderRadius: 20,
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.05,
-      shadowRadius: 6,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -213,71 +243,6 @@ export default function Post() {
       borderColor: colors.border,
       marginBottom: 10,
     },
-
-    locationRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      marginBottom: 10,
-    },
-    locationInput: {
-      flex: 1,
-      color: colors.text,
-      fontSize: 15,
-      marginLeft: 10,
-    },
-    useCurrentBtn: {
-      alignSelf: "flex-start",
-      borderWidth: 1,
-      borderColor: colors.primary,
-      borderRadius: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-    },
-    useCurrentText: { color: colors.primary, fontWeight: "600", fontSize: 14 },
-
-    pollRow: { flexDirection: "row", alignItems: "center" },
-    pollInput: { flex: 1, marginRight: 8 },
-    removeOption: {
-      backgroundColor: colors.surface,
-      borderRadius: 8,
-      padding: 6,
-    },
-    addOptionBtn: {
-      borderWidth: 1,
-      borderColor: colors.primary,
-      borderRadius: 10,
-      paddingVertical: 8,
-      alignItems: "center",
-      marginTop: 4,
-    },
-    addOptionText: {
-      color: colors.primary,
-      fontWeight: "600",
-      fontSize: 14,
-    },
-
-    linkRow: { flexDirection: "row", alignItems: "center" },
-    linkInput: { flex: 1, marginRight: 8 },
-    removeLink: {
-      backgroundColor: colors.surface,
-      borderRadius: 8,
-      padding: 6,
-    },
-    addLinkBtn: {
-      borderWidth: 1,
-      borderColor: colors.primary,
-      borderRadius: 10,
-      paddingVertical: 8,
-      alignItems: "center",
-      marginTop: 4,
-    },
-    addLinkText: { color: colors.primary, fontWeight: "600" },
   });
 
   return (
@@ -295,33 +260,31 @@ export default function Post() {
           onPress={handleShare}
           disabled={isPosting}
         >
-          <Text style={s.shareText}>{isPosting ? "Posting..." : "Share"}</Text>
+          <Text style={s.shareText}>
+            {isPosting ? "Posting..." : "Share"}
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
-        {/* IMAGES */}
+      <ScrollView style={s.scroll}>
+
+        {/* IMAGE AREA */}
         <View style={s.imageCard}>
           {selectedImages.length ? (
-            <ScrollView horizontal pagingEnabled>
-              {selectedImages.map((img, i) => (
-                <View key={i}>
-                  <Image source={{ uri: img }} style={s.image} />
-                  <TouchableOpacity
-                    style={s.removeBtn}
-                    onPress={() => removeImage(i)}
-                  >
-                    <X size={18} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
+            <View>
+              <Image source={{ uri: selectedImages[0] }} style={s.image} />
+              <TouchableOpacity style={s.removeBtn} onPress={removeImage}>
+                <X size={18} color="#fff" />
+              </TouchableOpacity>
+            </View>
           ) : (
             <TouchableOpacity style={s.placeholder} onPress={pickImages}>
               <View style={s.placeholderIcon}>
                 <Camera size={30} color={colors.textSecondary} />
               </View>
-              <Text style={s.placeholderText}>Tap to add up to 10 photos</Text>
+              <Text style={s.placeholderText}>
+                Tap to add a photo
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -330,95 +293,13 @@ export default function Post() {
         <View style={s.sectionCard}>
           <Text style={s.sectionTitle}>Caption</Text>
           <TextInput
-            placeholder="Write something inspiring..."
+            placeholder="Write something..."
             placeholderTextColor={colors.textTertiary}
             value={caption}
             onChangeText={setCaption}
             style={s.input}
             multiline
           />
-        </View>
-
-        {/* LOCATION */}
-        <View style={s.sectionCard}>
-          <Text style={s.sectionTitle}>Add Location</Text>
-          <View style={s.locationRow}>
-            <MapPin size={20} color={colors.textSecondary} />
-            <TextInput
-              placeholder="Where was this taken?"
-              placeholderTextColor={colors.textTertiary}
-              value={location}
-              onChangeText={setLocation}
-              style={s.locationInput}
-            />
-          </View>
-          <TouchableOpacity
-            style={s.useCurrentBtn}
-            onPress={() => setLocation("University of Houston")}
-          >
-            <Text style={s.useCurrentText}>Use Current Location</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* POLL */}
-        <View style={s.sectionCard}>
-          <Text style={s.sectionTitle}>Poll</Text>
-          <TextInput
-            placeholder="Ask a question..."
-            placeholderTextColor={colors.textTertiary}
-            value={pollQuestion}
-            onChangeText={setPollQuestion}
-            style={s.input}
-          />
-          {pollOptions.map((opt, i) => (
-            <View key={i} style={s.pollRow}>
-              <TextInput
-                placeholder={`Option ${i + 1}`}
-                placeholderTextColor={colors.textTertiary}
-                value={opt}
-                onChangeText={(t) => handleOptionChange(i, t)}
-                style={[s.input, s.pollInput]}
-              />
-              <TouchableOpacity
-                onPress={() => removeOption(i)}
-                style={s.removeOption}
-              >
-                <X size={16} color={colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          ))}
-          {pollOptions.length < 5 && (
-            <TouchableOpacity style={s.addOptionBtn} onPress={addOption}>
-              <Text style={s.addOptionText}>+ Add Option</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* LINKTREE */}
-        <View style={s.sectionCard}>
-          <Text style={s.sectionTitle}>Add Links</Text>
-          {links.map((link, i) => (
-            <View key={i} style={s.linkRow}>
-              <TextInput
-                placeholder="https://example.com"
-                placeholderTextColor={colors.textTertiary}
-                value={link}
-                onChangeText={(t) => handleLinkChange(i, t)}
-                style={[s.input, s.linkInput]}
-              />
-              <TouchableOpacity
-                onPress={() => removeLink(i)}
-                style={s.removeLink}
-              >
-                <X size={16} color={colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          ))}
-          {links.length < 5 && (
-            <TouchableOpacity style={s.addLinkBtn} onPress={addLink}>
-              <Text style={s.addLinkText}>+ Add Another Link</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={{ height: 120 }} />
