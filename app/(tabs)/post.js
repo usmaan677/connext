@@ -1,17 +1,20 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { supabase } from "@/lib/supabase";
-import { decode as atob } from "base-64";
-import * as FileSystem from "expo-file-system/legacy";
-
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 
-import { ArrowLeft, Camera, X } from "lucide-react-native";
+import {
+  ArrowLeft,
+  BarChart2,
+  Camera,
+  MapPin,
+  Navigation,
+  X,
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
-
 import {
   Alert,
   Dimensions,
-  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -26,184 +29,153 @@ const { width } = Dimensions.get("window");
 export default function Post() {
   const { colors } = useTheme();
 
+  /* ===================== STATE ===================== */
   const [caption, setCaption] = useState("");
-  const [selectedImages, setSelectedImages] = useState([]);
+  const [images, setImages] = useState([]);
   const [isPosting, setIsPosting] = useState(false);
 
-  // ============================================================
-  // PERMISSIONS
-  // ============================================================
+  // Poll
+  const [isPoll, setIsPoll] = useState(false);
+  const [pollOptions, setPollOptions] = useState(["", ""]);
+
+  // Location
+  const [location, setLocation] = useState(null);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [debounce, setDebounce] = useState(null);
+
+  const canPost =
+    caption.trim().length > 0 || images.length > 0 || isPoll;
+
+  /* ===================== PERMISSIONS ===================== */
   useEffect(() => {
-    requestPermissions();
+    ImagePicker.requestMediaLibraryPermissionsAsync();
   }, []);
 
-  const requestPermissions = async () => {
-    const cam = await ImagePicker.requestCameraPermissionsAsync();
-    const lib = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (cam.status !== "granted" || lib.status !== "granted") {
-      Alert.alert("Permissions Required", "Enable camera and library access.");
-    }
-  };
-
-  // ============================================================
-  // PICK IMAGES
-  // ============================================================
-  const pickImages = () => {
-    Alert.alert("Add Photo", "", [
-      { text: "Camera", onPress: takePhoto },
-      { text: "Library", onPress: pickFromLibrary },
-      { text: "Cancel", style: "cancel" },
-    ]);
-  };
-
-  const takePhoto = async () => {
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.9,
-    });
-
-    if (!result.canceled) {
-      setSelectedImages([result.assets[0].uri]);
-    }
-  };
-
-  const pickFromLibrary = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  /* ===================== IMAGE PICKER ===================== */
+  const pickImages = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({
       allowsMultipleSelection: true,
       quality: 0.9,
     });
 
-    if (!result.canceled) {
-      const newImgs = result.assets.map((a) => a.uri);
-      setSelectedImages((prev) => [...prev, ...newImgs].slice(0, 10));
+    if (!res.canceled) {
+      setImages((prev) =>
+        [...prev, ...res.assets.map((a) => a.uri)].slice(0, 10)
+      );
     }
   };
 
-  const removeImage = (index) => {
-    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (i) =>
+    setImages((p) => p.filter((_, idx) => idx !== i));
+
+  /* ===================== LOCATION AUTOCOMPLETE ===================== */
+  const searchLocation = (text) => {
+    setQuery(text);
+    if (debounce) clearTimeout(debounce);
+
+    if (text.length < 3) {
+      setResults([]);
+      return;
+    }
+
+    setDebounce(
+      setTimeout(async () => {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${text}`
+          );
+          const data = await res.json();
+          setResults(data.slice(0, 6));
+        } catch (e) {
+          console.log("Location search error", e);
+        }
+      }, 350)
+    );
   };
 
-  // ============================================================
-  // FIXED BASE64 → BINARY CONVERTER (RN SAFE)
-  // ============================================================
-  function decodeBase64(base64) {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
+  /* ===================== USE CURRENT LOCATION ===================== */
+  const useCurrentLocation = async () => {
+    const { status } =
+      await Location.requestForegroundPermissionsAsync();
 
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    if (status !== "granted") {
+      Alert.alert("Permission denied");
+      return;
     }
 
-    return bytes.buffer;
-  }
+    const pos = await Location.getCurrentPositionAsync({});
+    const { latitude, longitude } = pos.coords;
 
-  // ============================================================
-  // UPLOAD TO SUPABASE
-  // ============================================================
-  async function uploadImageToSupabase(uri, index) {
-    try {
-      const fileData = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    const data = await res.json();
 
-      const fileName = `post_${Date.now()}_${index}.jpg`;
+    setLocation(data.display_name);
+    setShowSearch(false);
+    setQuery("");
+    setResults([]);
+  };
 
-      const arrayBuffer = decodeBase64(fileData);
-
-      const { data, error } = await supabase.storage
-        .from("post-images")
-        .upload(fileName, arrayBuffer, {
-          contentType: "image/jpeg",
-          upsert: false,
-        });
-
-      if (error) {
-        console.log("SUPABASE STORAGE ERROR:", error);
-        return null;
-      }
-
-      const { data: url } = supabase.storage
-        .from("post-images")
-        .getPublicUrl(fileName);
-
-      return url.publicUrl;
-    } catch (err) {
-      console.log("UPLOAD ERROR:", err);
-      return null;
+  /* ===================== POLL HELPERS ===================== */
+  const addPollOption = () => {
+    if (pollOptions.length < 4) {
+      setPollOptions((p) => [...p, ""]);
     }
-  }
+  };
+
+  const removePollOption = (index) => {
+    if (pollOptions.length <= 2) {
+      // If only 2 options left, remove the whole poll
+      resetPoll();
+    } else {
+      setPollOptions((p) => p.filter((_, i) => i !== index));
+    }
+  };
 
 
-  // ============================================================
-  // HANDLE SHARE
-  // ============================================================
+  const resetPoll = () => {
+    setIsPoll(false);
+    setPollOptions(["", ""]);
+  };
+
+  /* ===================== SHARE POST ===================== */
   const handleShare = async () => {
+    if (!canPost) return;
     setIsPosting(true);
 
     try {
-      console.log("👉 getUser start");
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth?.user) throw new Error();
 
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      console.log("👉 getUser result:", JSON.stringify({ userData, userError }, null, 2));
-
-      if (!userData?.user) {
-        Alert.alert("Error", "You must be logged in.");
-        setIsPosting(false);
-        return;
-      }
-
-
-      const user = userData.user;
-
-      console.log("👉 starting uploads");
-      const uploadedUrls = [];
-
-      for (let i = 0; i < selectedImages.length; i++) {
-        console.log("   ⬆️ uploading image", i, selectedImages[i]);
-        const url = await uploadImageToSupabase(selectedImages[i], i);
-        console.log("   ⬆️ result image", i, url);
-        if (!url) {
-          Alert.alert("Upload error", "One of the images failed to upload.");
-          setIsPosting(false);
-          return;
-        }
-        uploadedUrls.push(url);
-      }
-
-      console.log("👉 inserting post with URLs:", uploadedUrls);
-      const { error: insertError } = await supabase.from("posts").insert({
+      const { error } = await supabase.from("posts").insert({
         caption,
-        images: uploadedUrls,
-        user_id: user.id,
-        full_name: profile?.full_name || "Unknown",
-        photo_url: profile?.photo_url || null,
+        images,
+        is_poll: isPoll,
+        poll_options: isPoll
+          ? pollOptions.filter((o) => o.trim())
+          : null,
+        location,
+        user_id: auth.user.id,
       });
 
-      console.log("👉 insert result:", insertError);
-      if (insertError) {
-        Alert.alert("Error", insertError.message);
-        setIsPosting(false);
-        return;
-      }
+      if (error) throw error;
 
-      Alert.alert("Posted!", "Your post has been uploaded.");
+      Alert.alert("Posted!");
       setCaption("");
-      setSelectedImages([]);
-    } catch (e) {
-      console.log("🔥 handleShare exception:", e);
-      Alert.alert("Error", "Something went wrong while posting.");
+      setImages([]);
+      resetPoll();
+      setLocation(null);
+    } catch {
+      Alert.alert("Error", "Failed to post");
     } finally {
       setIsPosting(false);
     }
   };
 
-
-  // ============================================================
-  // STYLES
-  // ============================================================
+  /* ===================== STYLES ===================== */
   const s = StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
 
@@ -211,157 +183,235 @@ export default function Post() {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingTop: 64,
+      paddingTop: 60,
       paddingHorizontal: 20,
       paddingBottom: 14,
-      borderBottomWidth: 0.6,
+      borderBottomWidth: 0.5,
       borderBottomColor: colors.border,
-      backgroundColor: colors.header,
     },
 
-    title: { fontWeight: "700", color: colors.text, fontSize: 18 },
-
-    shareBtn: {
-      backgroundColor: colors.primary,
-      paddingHorizontal: 18,
-      paddingVertical: 8,
-      borderRadius: 14,
-      opacity: isPosting ? 0.5 : 1,
+    title: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.textPrimary,
     },
 
-    shareText: { color: "#fff", fontWeight: "600" },
-
-    imageCard: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      backgroundColor: colors.surface,
+    share: {
+      fontWeight: "700",
+      color: canPost ? colors.accent : colors.textMuted,
     },
 
-    placeholder: {
-      height: width * 0.85,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.card,
-    },
-
-    image: {
-      width: width,
-      height: width * 0.9,
-      resizeMode: "cover",
-    },
-
-    removeBtn: {
-      position: "absolute",
-      top: 16,
-      right: 16,
-      backgroundColor: "rgba(0,0,0,0.5)",
-      padding: 6,
-      borderRadius: 20,
-    },
-
-    sectionCard: {
+    card: {
       backgroundColor: colors.card,
       marginHorizontal: 20,
       marginTop: 18,
       padding: 16,
-      borderRadius: 20,
-    },
-
-    sectionTitle: {
-      fontWeight: "700",
-      fontSize: 16,
-      color: colors.text,
-      marginBottom: 12,
+      borderRadius: 22,
     },
 
     input: {
       backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 12,
-      fontSize: 15,
-      color: colors.text,
+      borderRadius: 14,
+      padding: 14,
       borderWidth: 1,
       borderColor: colors.border,
-      minHeight: 80,
-      textAlignVertical: "top",
+      color: colors.textPrimary,
+    },
+
+    sectionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 12,
+    },
+
+    sectionText: {
+      color: colors.textSecondary,
+      fontWeight: "600",
+    },
+
+    optionRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginTop: 10,
+    },
+
+    removeBtn: {
+      backgroundColor: "rgba(255,255,255,0.08)",
+      padding: 8,
+      borderRadius: 12,
+    },
+
+    imageBox: {
+      height: width * 0.7,
+      margin: 20,
+      borderRadius: 22,
+      borderWidth: 1,
+      borderStyle: "dashed",
+      borderColor: colors.border,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    muted: {
+      color: colors.textMuted,
     },
   });
 
-  // ============================================================
-  // RENDER
-  // ============================================================
+  /* ===================== RENDER ===================== */
   return (
     <View style={s.container}>
-      <StatusBar barStyle="light-content" backgroundColor={colors.header} />
+      <StatusBar barStyle="light-content" />
 
       {/* HEADER */}
       <View style={s.header}>
-        <TouchableOpacity>
-          <ArrowLeft size={24} color={colors.text} />
-        </TouchableOpacity>
-
+        <ArrowLeft size={22} color={colors.textPrimary} />
         <Text style={s.title}>Create Post</Text>
-
         <TouchableOpacity
-          style={s.shareBtn}
+          disabled={!canPost || isPosting}
           onPress={handleShare}
-          disabled={isPosting}
         >
-          <Text style={s.shareText}>
-            {isPosting ? "Posting..." : "Share"}
+          <Text style={s.share}>
+            {isPosting ? "Posting…" : "Share"}
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* BODY */}
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* IMAGES */}
-        <View style={s.imageCard}>
-          {selectedImages.length ? (
-            <ScrollView
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              style={{ width: width, height: width * 0.9 }}
-            >
-              {selectedImages.map((img, index) => (
-                <View key={index} style={{ width: width }}>
-                  <Image source={{ uri: img }} style={s.image} />
+        {/* ADD PHOTOS */}
+        <TouchableOpacity style={s.imageBox} onPress={pickImages}>
+          <Camera size={34} color={colors.accent} />
+          <Text style={s.muted}>Add photos</Text>
+        </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={s.removeBtn}
-                    onPress={() => removeImage(index)}
-                  >
-                    <X size={18} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <TouchableOpacity style={s.placeholder} onPress={pickImages}>
-              <Camera size={34} color={colors.textSecondary} />
-              <Text style={{ color: colors.text, marginTop: 10 }}>
-                Tap to add up to 10 photos
+        {/* CAPTION */}
+        <View style={s.card}>
+          <TextInput
+            placeholder="Write something..."
+            placeholderTextColor={colors.textMuted}
+            value={caption}
+            onChangeText={setCaption}
+            multiline
+            maxLength={300}
+            style={[s.input, { minHeight: 90 }]}
+          />
+          <Text style={[s.muted, { alignSelf: "flex-end", marginTop: 6 }]}>
+            {caption.length}/300
+          </Text>
+        </View>
+
+        {/* POLL */}
+        <View style={s.card}>
+          <TouchableOpacity
+            style={s.sectionHeader}
+            onPress={() => setIsPoll(!isPoll)}
+          >
+            <BarChart2 size={18} color={colors.textSecondary} />
+            <Text style={s.sectionText}>
+              {isPoll ? "Edit Poll" : "Create Poll"}
+            </Text>
+          </TouchableOpacity>
+
+          {isPoll &&
+            pollOptions.map((opt, i) => (
+              <View key={i} style={s.optionRow}>
+                <TextInput
+                  placeholder={`Option ${i + 1}`}
+                  placeholderTextColor={colors.textMuted}
+                  value={opt}
+                  onChangeText={(t) =>
+                    setPollOptions((p) =>
+                      p.map((o, idx) => (idx === i ? t : o))
+                    )
+                  }
+                  style={[s.input, { flex: 1 }]}
+                />
+
+                {/* X IS ALWAYS VISIBLE */}
+                <TouchableOpacity
+                  style={s.removeBtn}
+                  onPress={() => removePollOption(i)}
+                >
+                  <X size={14} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+            ))}
+
+
+          {isPoll && pollOptions.length < 4 && (
+            <TouchableOpacity onPress={addPollOption}>
+              <Text style={{ color: colors.accent, marginTop: 12 }}>
+                + Add option
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {isPoll && (
+            <TouchableOpacity onPress={resetPoll}>
+              <Text style={{ color: "#EF4444", marginTop: 12 }}>
+                Remove poll
               </Text>
             </TouchableOpacity>
           )}
         </View>
 
-        {/* CAPTION */}
-        <View style={s.sectionCard}>
-          <Text style={s.sectionTitle}>Caption</Text>
+        {/* LOCATION */}
+        <View style={s.card}>
+          <TouchableOpacity
+            style={s.sectionHeader}
+            onPress={() => setShowSearch(!showSearch)}
+          >
+            <MapPin size={18} color={colors.accent} />
+            <Text
+              style={{
+                color: location ? colors.textPrimary : colors.textMuted,
+                fontWeight: location ? "600" : "400",
+              }}
+            >
+              {location || "Add location"}
+            </Text>
+          </TouchableOpacity>
 
-          <TextInput
-            placeholder="Write something..."
-            placeholderTextColor={colors.textTertiary}
-            value={caption}
-            onChangeText={setCaption}
-            style={s.input}
-            multiline
-          />
+          {showSearch && (
+            <>
+              <TouchableOpacity
+                style={[s.optionRow, { marginBottom: 8 }]}
+                onPress={useCurrentLocation}
+              >
+                <Navigation size={16} color={colors.accent} />
+                <Text style={{ color: colors.accent }}>
+                  Use current location
+                </Text>
+              </TouchableOpacity>
+
+              <TextInput
+                placeholder="Search city, venue, or place"
+                placeholderTextColor={colors.textMuted}
+                value={query}
+                onChangeText={searchLocation}
+                style={s.input}
+              />
+
+              {results.map((r) => (
+                <TouchableOpacity
+                  key={r.place_id}
+                  style={{ paddingVertical: 10 }}
+                  onPress={() => {
+                    setLocation(r.display_name);
+                    setShowSearch(false);
+                    setQuery("");
+                    setResults([]);
+                  }}
+                >
+                  <Text style={s.muted}>{r.display_name}</Text>
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
         </View>
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: 140 }} />
       </ScrollView>
     </View>
   );

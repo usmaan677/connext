@@ -324,9 +324,13 @@ export default function HomeScreen() {
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={s.iconButton}>
+                <TouchableOpacity
+                  style={s.iconButton}
+                  onPress={() => router.push(`/(tabs)/comments/${post.id}`)}
+                >
                   <Feather name="message-circle" size={25} color={colors.icon} />
                 </TouchableOpacity>
+
 
                 <TouchableOpacity onPress={onShare}>
                   <Feather name="send" size={24} color={colors.icon} />
@@ -387,7 +391,10 @@ export default function HomeScreen() {
                     color={liked ? "red" : colors.icon}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity style={s.iconButton}>
+                <TouchableOpacity
+                  style={s.iconButton}
+                  onPress={() => router.push(`/(tabs)/comments/${post.id}`)}
+                >
                   <Feather name="message-circle" size={25} color={colors.icon} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={onShare}>
