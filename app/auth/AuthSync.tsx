@@ -20,8 +20,7 @@ export default function AuthSync() {
         supabase.from("profiles").upsert(payload, { onConflict: "user_id" }) // ← Changed onConflict to user_id
           .then(({ error }) => { 
             if (error) console.log("profiles upsert error:", error); 
-          })
-          .catch((e: any) => console.log("profiles upsert exception:", e));
+          }, (e) => console.log("profiles upsert exception:", e));
       }
     });
     return () => subscription.subscription.unsubscribe();
