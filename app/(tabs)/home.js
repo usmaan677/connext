@@ -14,6 +14,14 @@ import {
   View
 } from "react-native";
 
+import RNPoll from "react-native-poll";
+
+const choices = [
+  { id: 1, choice: "Yes", votes: 12 },
+  { id: 2, choice: "No", votes: 8 },
+  { id: 3, choice: "Hell nah", votes: 5 },
+];
+
 
 // ===============================================================
 // ⭐ YOUR ORIGINAL POSTS (kept exactly as you had them)
@@ -29,6 +37,7 @@ const staticPosts = [
       + "All proceeds will go toward humanitarian aid efforts in Palestine. "
       + "Bring your friends, family, and good vibes — let’s make a difference together ❤️ "
       + "#UMR #Run4Palestine #CharityRun #HoustonEvents",
+    choices: choices,
   },
   {
     id: "local-2",
@@ -258,7 +267,6 @@ export default function HomeScreen() {
         </View>
 
         <View style={s.headerActions}>
-          {/* Theme toggle */}
           <TouchableOpacity onPress={toggleTheme}>
             <Feather 
               name={theme === "dark" ? "sun" : "moon"} 
@@ -267,7 +275,6 @@ export default function HomeScreen() {
             />
           </TouchableOpacity>
 
-          {/* Profile */}
           <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
             <Image
               source={{
@@ -284,11 +291,10 @@ export default function HomeScreen() {
 
       {/* FEED */}
       <ScrollView contentContainerStyle={s.feedContent}>
-        
+
         {/* ⭐ REAL SUPABASE POSTS (TOP) */}
         {supabasePosts.map((post) => (
           <View key={post.id} style={s.postCard}>
-            
             <View style={s.postHeader}>
               <Image
                 source={{ uri: post.photo_url || "https://picsum.photos/40" }}
@@ -299,13 +305,15 @@ export default function HomeScreen() {
               </Text>
             </View>
 
-            {/* Post image */}
             <Image
-              source={{ uri: post.images?.[0] }}
+              source={
+                typeof post.image === "number"
+                  ? post.image
+                  : { uri: post.image }
+              }
               style={s.postImage}
             />
 
-            {/* Actions */}
             <View style={s.postActionsRow}>
               <View style={s.leftActions}>
                 <TouchableOpacity onPress={() => setLiked(!liked)}>
@@ -356,6 +364,19 @@ export default function HomeScreen() {
               }
               style={s.postImage}
             />
+
+            {/* ✅ POLL (ONLY ADDITION) */}
+            {post.choices && (
+              <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+                <RNPoll
+                  totalVotes={post.choices.reduce((sum, c) => sum + c.votes, 0)}
+                  choices={post.choices}
+                  onChoicePress={(choice) => {
+                    console.log("Voted:", choice);
+                  }}
+                />
+              </View>
+            )}
 
             <View style={s.postActionsRow}>
               <View style={s.leftActions}>
